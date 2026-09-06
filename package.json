@@ -1,7 +1,7 @@
 {
   "name": "doguxclaude",
   "version": "0.1.0",
-  "description": "Claude Code'u makinendeki depoların haritasıyla başlatır. Harita kodla çıkarılır, tek satırlık açıklamaları model yazar.",
+  "description": "Claude Code that already knows your machine. 250 ms, zero config. — Makineni zaten bilen Claude Code. 250 ms, sıfır ayar.",
   "type": "module",
   "bin": {
     "dxc": "dist/cli.js"
