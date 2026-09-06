@@ -3,6 +3,15 @@
 dxc üç şey yapar: **harita**, **yapı enjeksiyonu**, **hafıza**.
 Harita nerede ne olduğunu, yapı içinde ne olduğunu, hafıza ne konuşulduğunu söyler.
 
+| | Ne zaman üretilir | Nerede durur | Model çalışır mı |
+|---|---|---|---|
+| **Harita** | yeni ya da şekli değişmiş depo varsa | `index.md` üst bölüm | evet, depo başına bir kez |
+| **Yapı** | bir deponun adını andığın anda | hiçbir yerde, o an üretilir | hayır, hep kod |
+| **Hafıza** | oturum kapanınca | `index.md` alt bölüm | evet, oturum başına bir kez |
+
+Normal bir açılışta model **hiç çalışmaz**. Harita güncelse tarama 250 ms sürer
+ve oturum açılır.
+
 ---
 
 ## 1. Harita — `~/.doguxclaude/index.md`
@@ -11,6 +20,9 @@ Harita nerede ne olduğunu, yapı içinde ne olduğunu, hafıza ne konuşulduğu
 
 Makinendeki bütün git depolarının tek satırlık listesi. Her deponun yanında ne
 iş yaptığını anlatan bir cümle, dosya sayısı ve son değişiklik tarihi vardır.
+
+`index.md` iki bölümlüdür: üstte bu harita, altta `## Hafıza` başlığıyla son otuz
+oturum. İkisi de aynı dosyada olduğu için tek seferde yükleniyor.
 
 Her oturumun başında sisteme yüklenir. Böylece model, sen yolunu söylemeden
 hangi deponun nerede olduğunu bilir.
@@ -24,7 +36,9 @@ hangi deponun nerede olduğunu bilir.
    model yoktur.
 3. Yapılar modele verilir. Model her depo için **tek cümle** yazar. Yalnız klasör
    ve dosya adlarından çıkarabildiğini yazar; emin olmadığına "belirsiz" der.
-4. Sonuç `index.md`'ye yazılır.
+4. Sonuç `index.md`'nin **üst bölümüne** yazılır. Alt bölümdeki hafıza satırları
+   önce okunur ve olduğu gibi geri konur; harita tazelenirken oturum geçmişi
+   silinmez. Ayrıntı: [İki yazıcı, tek dosya](#iki-yazıcı-tek-dosya).
 
 ### Ne zaman yenilenir
 
