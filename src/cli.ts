@@ -6,10 +6,13 @@ import { spawn } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { basename, join, resolve } from 'node:path';
 import { haritaOku, haritaTazele } from './harita.js';
-import { baslik, satir, son, stdinBosalt, sure, tik, vurgu } from './ekran.js';
+import { kisaBaslik, kutuBas, ok, satir, son, stdinBosalt, sure, tik, vurgu } from './ekran.js';
 import { depoOzeti } from './ozet.js';
 import { iceridekiDepo } from './tarama.js';
 import { hata, HARITA_YOLU, yaz } from './util.js';
+
+/** Git deposu olmayan klasör için soluk not. */
+const GIT_YOK = ' \x1b[2m(git deposu değil, yapı verilmedi)\x1b[0m';
 
 const KULLANIM = `dxc — Claude'u makinendeki depoların haritasıyla başlatır
 
@@ -39,15 +42,15 @@ function komutOzet(konum: string[]): number {
   return 0;
 }
 
-function komutHarita(acik: Set<string>): number {
+async function komutHarita(acik: Set<string>): Promise<number> {
   if (acik.has('goster')) {
     const h = haritaOku();
     if (!h) { console.error(hata('harita', 'harita yok', 'dxc ile üret')); return 1; }
     console.log(h); return 0;
   }
-  baslik();
-  const s = haritaTazele({ zorla: acik.has('zorla'), modelsiz: acik.has('modelsiz') });
-  son(s.degisti ? `${tik()} harita güncellendi ${vurgu(HARITA_YOLU)}` : `${tik()} harita zaten güncel`);
+  const s = await haritaTazele({ zorla: acik.has('zorla'), modelsiz: acik.has('modelsiz') });
+  kutuBas();
+  son(`${tik()} harita ${vurgu(HARITA_YOLU)} ${sure(s.kodMs + s.modelMs)}`);
   return 0;
 }
 
@@ -63,16 +66,19 @@ const YONERGE = [
 /** Her açılışta depolar taranır (9 ms, bedava) ve harita gerekiyorsa tazelenir.
  *  Yeni depo eklendiyse yalnız onun açıklaması yazdırılır; var olanlara dokunulmaz.
  *  Kullanıcı hiçbir şey kurmaz, hiçbir komut ezberlemez: terminale `dxc` yazar. */
-function haritaSagla(): string {
-  haritaTazele();
+let sonTazeleme = { isVar: false, depoSayisi: 0 };
+
+async function haritaSagla(): Promise<string> {
+  const s = await haritaTazele();
+  sonTazeleme = { isVar: s.isVar, depoSayisi: s.depolar.length };
   return (haritaOku() ?? '').trim();
 }
 
-function baglam(): string {
+async function baglam(): Promise<string> {
   const cwd = process.cwd();
   const depo = iceridekiDepo(cwd);
   const parcalar: string[] = [];
-  const harita = haritaSagla();
+  const harita = await haritaSagla();
   if (harita) parcalar.push(harita);
   else parcalar.push('# Harita\n\nÜretilemedi.');
 
@@ -85,23 +91,33 @@ function baglam(): string {
   return parcalar.join('\n');
 }
 
+/** İki kip: gerçek iş yapıldıysa tam gösteri, yapılmadıysa tek satır.
+ *  0,2 sn'lik koşuyu altı satırlık banner ile boğmak istemiyoruz. */
 async function baslat(argv: string[], acik: Set<string>): Promise<number> {
   const t0 = Date.now();
-  baslik();
-  const metin = baglam();
+  const metin = await baglam();   // satırlar burada birikir, kip sonra belli olur
   const depo = iceridekiDepo(process.cwd());
-  satir(depo ? `${vurgu(basename(depo))} ${sure(Date.now() - t0)}` : `git deposu değil ${sure(Date.now() - t0)}`);
-  son(acik.has('kuru') ? `${tik()} kuru koşu` : `${tik()} claude başlatılıyor`);
+  // BULUNDUĞUN klasörü anlatır, haritadaki depoları değil: ikisi karışmasın.
+  const nerede = depo ? basename(depo) : (basename(process.cwd()) || process.cwd());
+  const gecen = Date.now() - t0;
+
+  if (sonTazeleme.isVar) {
+    satir(`${ok()} buradasın: ${vurgu(nerede)}${depo ? '' : GIT_YOK}`);
+    kutuBas();
+    son(`${tik()} ${acik.has('kuru') ? 'kuru koşu' : 'claude başlatılıyor'} ${sure(gecen)}`);
+  } else {
+    kisaBaslik(`${vurgu(String(sonTazeleme.depoSayisi))} depo · ${vurgu(nerede)}${depo ? '' : GIT_YOK}`, gecen);
+  }
   if (acik.has('kuru')) { console.log(metin); return 0; }
   const yol = join(tmpdir(), `dxc-${process.pid}.md`);
   yaz(yol, metin);
-  const gecen = argv.filter((a) => a !== '--kuru');
+  const claudeBayraklari = argv.filter((a) => a !== '--kuru');
   // Bekleme sırasında basılan tuşlar terminal arabelleğinde birikir ve `stdio: 'inherit'`
   // ile claude'a gider: kazara mesaj gönderilmiş olur. Devretmeden önce temizlenir.
   const atilan = stdinBosalt();
-  if (atilan) satir(`${atilan} karakterlik tuş girişi atıldı (bekleme sırasında yazılmış)`);
+  if (atilan) process.stderr.write(` ${atilan} karakterlik tuş girişi atıldı (bekleme sırasında yazılmıştı)\n`);
   return await new Promise((coz) => {
-    const c = spawn('claude', ['--append-system-prompt-file', yol, ...gecen], { stdio: 'inherit' });
+    const c = spawn('claude', ['--append-system-prompt-file', yol, ...claudeBayraklari], { stdio: 'inherit' });
     c.on('error', (e) => { console.error(hata('dxc', `claude başlatılamadı (${e.message})`, 'Claude CLI kurulu mu')); coz(127); });
     c.on('exit', (k) => coz(k ?? 0));
   });

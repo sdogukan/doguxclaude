@@ -8,7 +8,7 @@
  *  var olanlara dokunulmaz. Silinen depo haritadan düşer. */
 import { spawnSync } from 'node:child_process';
 import { homedir } from 'node:os';
-import { bekle, calisiyor, satir, son, sure, tik, vurgu } from './ekran.js';
+import { banner, bekle, calisiyor, ok, satir, sure, tik, uyari, vurgu } from './ekran.js';
 import { depoOzeti } from './ozet.js';
 import { Depo, depoBilgisi, depolariBul } from './tarama.js';
 import { durumOku, durumYaz, sekilIzi } from './durum.js';
@@ -58,10 +58,12 @@ export interface TazelemeSonucu {
   degisti: boolean;
   kodMs: number;
   modelMs: number;
+  /** Gerçek iş yapıldı mı: banner ve kutu yalnız bu doğruysa gösterilir. */
+  isVar: boolean;
 }
 
 /** Depoları tarar, haritayı gerekiyorsa tazeler. `zorla` ile tüm açıklamalar yeniden yazdırılır. */
-export function haritaTazele(secenek: { zorla?: boolean; modelsiz?: boolean; sessiz?: boolean } = {}): TazelemeSonucu {
+export async function haritaTazele(secenek: { zorla?: boolean; modelsiz?: boolean; sessiz?: boolean } = {}): Promise<TazelemeSonucu> {
   const t0 = Date.now();
   const ev = homedir();
   const depolar = depolariBul(ev).map((y) => depoBilgisi(y, ev));
@@ -85,10 +87,15 @@ export function haritaTazele(secenek: { zorla?: boolean; modelsiz?: boolean; ses
   // Sayı ve tarih bedava hesaplanıyor; harita her açılışta yazılır ki bayatlamasın.
   const degisti = true;
 
+  const isVar = yeni.length > 0 || dusen.length > 0;
+  // Banner iş olduğu anlaşılınca, model çağrısından ÖNCE basılır: yoksa
+  // dönen gösterge banner'dan önce ekrana düşüyor.
+  if (!secenek.sessiz && isVar) await banner();
   if (!secenek.sessiz) {
-    satir(`${depolar.length} depo ${sure(kodMs)}`);
-    for (const d of dusen) satir(`${vurgu(d)} artık yok, haritadan düştü`);
-    for (const d of sekliDegisen) satir(`${vurgu(d)} yapısı değişti, açıklama yenilenecek`);
+    satir(`${ok()} ${vurgu(String(depolar.length))} depo tarandı ${sure(kodMs)}`);
+    for (const d of dusen) satir(`${uyari('−')} ${d} artık yok, haritadan düştü`);
+    for (const d of sekliDegisen) satir(`${uyari('~')} ${vurgu(d)} yapısı değişti`);
+    for (const d of yeniDepo) satir(`${uyari('+')} ${vurgu(d)} yeni depo`);
   }
 
   let modelMs = 0;
@@ -100,11 +107,11 @@ export function haritaTazele(secenek: { zorla?: boolean; modelsiz?: boolean; ses
     }).join('\n\n');
     if (!secenek.sessiz) bekle(`${yeni.length} depo için açıklama yazılacak, ${yeni.length * 8} sn sürebilir`);
     const bitir = secenek.sessiz ? () => {}
-      : calisiyor(`${yeni.length} depo için açıklama yazılıyor${yeni.length <= 3 ? `: ${yeni.join(', ')}` : ''}`);
+      : calisiyor(`${yeni.length} açıklama yazılıyor`, yeni.length * 8);
     const t1 = Date.now();
     uretilen = aciklamalariUret(girdi);
     modelMs = Date.now() - t1;
-    bitir(uretilen ? `${tik()} ${yeni.length} açıklama ${sure(modelMs)}` : `açıklama üretilemedi ${sure(modelMs)}`);
+    bitir(uretilen ? `${tik()} ${yeni.length} açıklama yazıldı ${sure(modelMs)}` : `${uyari('✗')} açıklama üretilemedi ${sure(modelMs)}`);
   }
 
   if (degisti) {
@@ -118,7 +125,7 @@ export function haritaTazele(secenek: { zorla?: boolean; modelsiz?: boolean; ses
   }
   // Parmak izleri ayrı dosyada: index.md her oturuma yükleniyor, makine verisi oraya girmez.
   durumYaz({ surum: 1, depolar: Object.fromEntries(depolar.map((d) => [d.goreli, { sekil: izler.get(d.goreli)! }])) });
-  return { depolar, yeni, dusen, degisti, kodMs, modelMs };
+  return { depolar, yeni, dusen, degisti, kodMs, modelMs, isVar };
 }
 
 function haritaMetni(satirlar: HaritaSatiri[]): string {
@@ -130,4 +137,3 @@ function haritaMetni(satirlar: HaritaSatiri[]): string {
 }
 
 export function haritaOku(): string | null { return oku(HARITA_YOLU); }
-export { son };
