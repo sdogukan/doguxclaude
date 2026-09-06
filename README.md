@@ -202,6 +202,53 @@ Arka planda koşar, terminal anında geri gelir.
 
 ---
 
+## Neden başka türlü
+
+Bu alandaki araçların çoğu aynı refleksi paylaşıyor: **işi modele yaptır.**
+Vektör veritabanı kur, gömme üret, her düzenlemede bir alt ajan çalıştır, her
+oturumda bir analiz koşusu aç.
+
+Biz tersini yapıyoruz. **Bir deponun yapısını çıkarmak okuma işidir, yargı
+değil.** Okumaya model koşmak hem yavaş hem pahalı. `git ls-files` bunu 10 ms'de
+yapıyor ve asla bayatlamıyor. Modele yalnızca gerçekten yargı gerektiren tek şeyi
+soruyoruz: bu depo ne iş yapıyor, tek cümle, depo başına bir kez.
+
+Angaryayı kod hallediyor. Model zaten zeki, ona sadece gerekeni veriyoruz.
+
+### Alanda ne var
+
+| | Kurulum | Hafıza nasıl yazılır | Model maliyeti | Ölçüm |
+|---|---|---|---|---|
+| [claude-code-memory-setup](https://github.com/lucasrosati/claude-code-memory-setup) <sub>966★</sub> | Obsidian + 3 eklenti, Graphify, Python paketi, tarayıcı eklentisi, cron | `/save` yazmayı hatırlarsan | AST modunda yok | Yok. "71,5x" iki tahminin bölümü; aynı sayfa başka yerde "499x" diyor |
+| [claudecode-harness](https://github.com/anothervibecoder-s/claudecode-harness) <sub>222★</sub> | Şablonu kopyala, 39 yer tutucu doldur, Stop kancasını kendin yaz | Model talimatı unutmazsa | — | Yok |
+| [Claude-code-memory](https://github.com/Durafen/Claude-code-memory) <sub>74★</sub> | İki ayrı depo, Docker, Qdrant, gömme API anahtarı, proje başına koleksiyon | İndeksleyiciyi çalıştırınca | Her Write/Edit'te 60 sn'ye kadar bloklayan Sonnet alt süreci | README'de sayılar var, depoda benchmark yok |
+| [clauth Hive Mind](https://github.com/umuplus/clauth) <sub>6★</sub> | Profil başına aç, her oturum sonu Y/n onayla | Onaylarsan | Oturum başına tam ajan koşusu | Yok |
+| **doguxclaude** | **Yok** | **Kendiliğinden** | **Oturum başına tek cümle** | **Üçer koşu, yöntem sayfada** |
+
+İki tanesi araç bile değil. 966 yıldızlı olanda 433 satır çalıştırılabilir kod ve
+1.276 satır README var; `/save` ile `/resume` gerçek komut değil, CLAUDE.md içine
+düzyazı yazılmış talimatlar. 222 yıldızlı olanda iki markdown dosyası var, tek bir
+kod bloğu yok, bahsettiği Stop kancası depoda mevcut değil.
+
+### Nerede geridiyiz
+
+Bunu saklamıyoruz, çünkü rakiplerin en çok kaybettiği yer burası.
+
+**Derinlik.** Graphify ve Qdrant tabanlı indeksleyici tree-sitter ile fonksiyon ve
+sınıf düzeyine iniyor, çağrı ve kalıtım grafiği çıkarıyor. Bizim haritamız klasör
+ve dosya adında kalıyor. "Bu fonksiyona benzer başka nerede var" diye soramazsın.
+
+**Kalıcılık.** Hafızamızın tavanı 30 satır ve otuz birinci gelince en eski
+**kalıcı olarak siliniyor**. clauth'un wiki'si birikiyor, kategorilere ayrılıyor,
+aranabiliyor. Bizde arama yok, sadece enjeksiyon var.
+
+**Olgunluk.** Sıfır kullanıcı. Şimdilik yalnız macOS'ta denendi.
+
+Bunlar tercih, eksik değil. Aramayı ve grafiği eklemek altyapı istiyor; altyapı
+istemek de kurulum demek. Biz sıfır kurulumu koruyoruz.
+
+---
+
 ## Komutlar
 
 ```
@@ -245,6 +292,20 @@ description is a judgement, so the model does it once per repo. Scanning 11 repo
 takes 250 ms. Output does not grow with the codebase: 1,120 files become 72 lines.
 
 Nothing is written to `~/.claude/settings.json`. Zero config, nothing to memorise.
+
+**Why it is built this way.** Most tools in this space reach for the model: a
+vector database, embeddings, a subagent on every edit, an analysis run every
+session. Extracting a repo's structure is a reading, not a judgement, so code
+does it in 10 ms and it never goes stale. The model is asked only the one thing
+that is genuinely a judgement: what this repo is for, one sentence, once per repo.
+
+Setup for the alternatives ranges from six tools and a cron job, to Docker plus
+Qdrant plus an embeddings API key, to copying a template and filling in 39
+placeholders. Setup here is `npm install -g doguxclaude`.
+
+Where we are behind: no AST, no semantic search, and memory is capped at 30 lines
+before the oldest is dropped for good. Those are trade-offs for zero setup, and
+they are in the comparison table above rather than hidden.
 
 ```bash
 npm install -g doguxclaude && dxc
