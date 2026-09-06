@@ -30,39 +30,28 @@ export function sure(ms: number): string {
   return `${SOLUK}${GRI}${ms < 1000 ? `${ms} ms` : `${(ms / 1000).toFixed(1)} sn`}${R}`;
 }
 
-/** Renk çarkı: dalga animasyonunda gradyan durakları buradan kaydırılır. */
-const CARK = ['#a855f7', '#c026d3', '#e11d48', '#f59e0b', '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6'];
-
-function carktanGradyan(kaydir: number): (s: string) => string {
-  const n = CARK.length;
-  const duraklar = [0, 1, 2, 3].map((i) => CARK[(kaydir + i * 2) % n]!);
-  return gradient(duraklar);
-}
-
-/** Büyük banner, gradyan dalgasıyla canlandırılır. Yalnız gerçek iş varken;
- *  hızlı koşu tek satırla geçer. Animasyon ~700 ms, iş zaten saniyeler sürüyor. */
+/** Büyük banner, satır satır açılarak canlandırılır.
+ *  Yerinde yeniden çizim (imleç yukarı) denendi ve bozuldu: cfonts'un satır
+ *  sayısı ile ekrana düşen satır sayısı tutmayınca banner alt alta tekrarlıyordu.
+ *  Satır satır açılış imleç matematiği gerektirmez, bozulamaz. */
 export async function banner(): Promise<void> {
   if (!TTY) { process.stderr.write('dxc — dogu x claude · depo haritası\n'); return; }
 
-  // Ham ASCII'yi bir kez üret, her karede kendimiz renklendirelim.
   const cizim = cfonts.render('dxc', { font: 'block', align: 'left', space: false, colors: ['white'] });
   const ham: string[] = cizim === false ? [] : cizim.array;
-  const satirlar = ham.map((s) => s.replace(/\x1b\[[0-9;]*m/g, ''));
-  if (!satirlar.length) { cfonts.say('dxc', { font: 'block', gradient: MOR_CAM as unknown as string[], space: false }); return; }
+  const satirlar = ham.map((s) => s.replace(/\x1b\[[0-9;]*m/g, '')).filter((s) => s.trim().length);
 
-  const yaz = (kaydir: number, ilk: boolean) => {
-    const g = carktanGradyan(kaydir);
-    if (!ilk) process.stderr.write(`\x1b[${satirlar.length}A`);
-    for (const s of satirlar) process.stderr.write(`\r\x1b[K${g(s)}\n`);
-  };
-
-  process.stderr.write('\x1b[?25l');           // imleci gizle
-  for (let k = 0; k < 14; k++) {
-    yaz(k, k === 0);
-    await new Promise((c) => setTimeout(c, 50));
+  if (!satirlar.length) {
+    cfonts.say('dxc', { font: 'block', gradient: MOR_CAM as unknown as string[], space: false });
+  } else {
+    process.stderr.write('\x1b[?25l');
+    process.stderr.write('\n');
+    for (const s of satirlar) {
+      process.stderr.write(`${gecis(s)}\n`);
+      await new Promise((c) => setTimeout(c, 55));
+    }
+    process.stderr.write('\x1b[?25h');
   }
-  yaz(0, false);                                 // son karede mor→cam sabit
-  process.stderr.write('\x1b[?25h');           // imleci geri getir
   process.stderr.write(`   ${gecis('dogu x claude')}  ${SOLUK}${GRI}· depo haritası · Dogu X Vibes${R}\n\n`);
 }
 

@@ -101,7 +101,10 @@ export async function haritaTazele(
   }
 
   // Kutu, model çağrısından ÖNCE basılır: kullanıcı beklerken ne olduğunu görsün.
+  // Bekleme uyarısı da kutuya girmeli, yoksa hiç görünmüyor.
+  const modelCalisacak = yeni.length > 0 && !secenek.modelsiz;
   if (!secenek.sessiz) {
+    if (modelCalisacak) bekle(`${yeni.length} açıklama yazılacak, ${yeni.length * 8} sn sürebilir`);
     if (secenek.ekSatir) satir(secenek.ekSatir);
     kutuBas();
   }
@@ -113,7 +116,6 @@ export async function haritaTazele(
       const o = ozetler.get(d.goreli)!;
       return `## ${d.goreli}\n${o.dosyaSayisi} dosya · son değişiklik ${d.sonDegisiklik}\n\`\`\`\n${o.metin}\n\`\`\``;
     }).join('\n\n');
-    if (!secenek.sessiz) bekle(`${yeni.length} depo için açıklama yazılacak, ${yeni.length * 8} sn sürebilir`);
     const bitir = secenek.sessiz ? () => {}
       : calisiyor(`${yeni.length} açıklama yazılıyor`, yeni.length * 8);
     const t1 = Date.now();
