@@ -14,9 +14,10 @@ export interface OzetSecenek {
   esikOrani?: number;      // toplam/esikOrani = eşik (varsayılan 50, yani %2)
   toplamaEsigi?: number;   // bu kadar küçük kardeş varsa tek satıra toplanır (varsayılan 4)
   maxDerinlik?: number;    // varsayılan 6
+  adSatirTavani?: number;  // toplama satırındaki ad listesinin karakter tavanı
 }
 
-const VARSAYILAN: Required<OzetSecenek> = { esikOrani: 50, toplamaEsigi: 4, maxDerinlik: 6 };
+const VARSAYILAN: Required<OzetSecenek> = { esikOrani: 50, toplamaEsigi: 4, maxDerinlik: 6, adSatirTavani: 600 };
 
 export interface Ozet {
   satirlar: string[];
@@ -58,9 +59,14 @@ export function depoOzeti(depo: string, secenek: OzetSecenek = {}): Ozet {
       if (derinlik < s.maxDerinlik) gez(c, derinlik + 1);
     }
     if (kucuk.length >= s.toplamaEsigi) {
+      // Adların TAMAMI yazılır, örnek değil. Ölçüldü: 3 örnek verince ajan kalan
+      // adları öğrenmek için `ls` çalıştırıyordu. Adlar kısa, tamamı birkaç yüz bayt.
       const toplam = kucuk.reduce((t, c) => t + agirlik.get(c)!, 0);
-      const ornek = kucuk.slice(0, 3).map(ad).join(', ');
-      satirlar.push(`${ic}… ${kucuk.length} klasör daha (${toplam} dosya): ${ornek}…`);
+      const adlar = kucuk.map(ad).join(', ');
+      const kirpik = adlar.length > s.adSatirTavani
+        ? adlar.slice(0, s.adSatirTavani) + `… (+${kucuk.length - adlar.slice(0, s.adSatirTavani).split(', ').length} tane)`
+        : adlar;
+      satirlar.push(`${ic}… ${kucuk.length} klasör (${toplam} dosya): ${kirpik}`);
     } else {
       for (const c of kucuk) satirlar.push(`${ic}${ad(c)}/  (${agirlik.get(c)})`);
     }

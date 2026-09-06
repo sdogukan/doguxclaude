@@ -12,11 +12,12 @@ import { hata, HARITA_YOLU, yaz } from './util.js';
 
 const KULLANIM = `dxc — Claude'u makinendeki depoların haritasıyla başlatır
 
-  dxc                başlat (claude bayrakları olduğu gibi geçer)
-  dxc --kuru         başlatmadan, enjekte edilecek metni göster
+  dxc                başlat. İlk çalıştırmada depoları tarar ve haritayı
+                     kendiliğinden çıkarır; sonraki oturumlar anında açılır.
+                     Claude bayrakları olduğu gibi geçer.
 
-  dxc harita         haritayı yeniden üret (--modelsiz: açıklama yazdırma)
-  dxc harita --goster
+  dxc --kuru         başlatmadan, enjekte edilecek metni göster
+  dxc harita         haritayı yenile (--modelsiz, --goster)
   dxc ozet [klasör]  bir deponun yapısını çıkar (kod, model yok)
 `;
 
@@ -50,18 +51,38 @@ function komutHarita(acik: Set<string>): number {
   return 0;
 }
 
+/** Enjekte edilen yapının nasıl kullanılacağı. Liste tek başına yönlendirmiyor:
+ *  ölçüldü, ajan yapıyı elinde olduğu halde `ls` ile baştan keşfetti (6 araç çağrısı). */
+const YONERGE = [
+  'Aşağıdaki klasör yapısı `git ls-files` çıktısından üretildi ve günceldir.',
+  'Yapıyı öğrenmek için `ls`, `find`, `tree` çalıştırma; sayılar klasörün altındaki dosya sayısıdır.',
+  'Bu özet dosya İÇERİĞİNİ, satır sayılarını ve fonksiyon adlarını içermez; onlar gerekiyorsa doğrudan ilgili dosyayı oku.',
+  'Deponun kendi CLAUDE.md dosyası varsa geçerliliğini korur: bu özet onun yerine geçmez, yalnız yapıyı tekrar keşfetme yükünü kaldırır.',
+].join('\n');
+
+/** İlk çalıştırma: harita yoksa kendiliğinden üretilir. Kullanıcı hiçbir şey kurmaz,
+ *  hiçbir komut ezberlemez; terminale `dxc` yazar ve sistem çalışır. */
+function haritaSagla(): string {
+  const mevcut = haritaOku();
+  if (mevcut) return mevcut.trim();
+  process.stderr.write('dxc: ilk çalıştırma — depolar taranıyor ve harita çıkarılıyor (bir kez, ~40 sn)…\n');
+  const s = haritaUret();
+  process.stderr.write(`dxc: ${s.depolar.length} depo · kod ${s.kodMs} ms` +
+    (s.modelCalisti ? ` · açıklamalar ${(s.modelMs / 1000).toFixed(0)} sn` : ' · açıklama üretilemedi') + '\n');
+  return (haritaOku() ?? '').trim();
+}
+
 function baglam(): string {
   const cwd = process.cwd();
   const depo = iceridekiDepo(cwd);
   const parcalar: string[] = [];
-  const harita = haritaOku();
-  if (harita) parcalar.push(harita.trim());
-  else parcalar.push('# Harita\n\nHenüz üretilmedi. `dxc harita` ile üretilebilir.');
+  const harita = haritaSagla();
+  if (harita) parcalar.push(harita);
+  else parcalar.push('# Harita\n\nÜretilemedi.');
 
   if (depo) {
     const o = depoOzeti(depo);
-    parcalar.push(`\n---\n\n# Bu depo: ${basename(depo)}\n\n` +
-      `${depo}\n${o.dosyaSayisi} dosya · yapı koddan çıkarıldı, eksik olabilir\n\n\`\`\`\n${o.metin}\n\`\`\``);
+    parcalar.push(`\n---\n\n# Bu depo: ${basename(depo)}\n\n${depo} · ${o.dosyaSayisi} dosya\n\n${YONERGE}\n\n\`\`\`\n${o.metin}\n\`\`\``);
   } else {
     parcalar.push(`\n---\n\n# Bu klasör\n\n${cwd} — git deposu değil, yapı çıkarılmadı.`);
   }

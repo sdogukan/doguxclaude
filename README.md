@@ -3,10 +3,12 @@
 Claude Code'u makinendeki depoların haritasıyla başlatır. Terminal komutu: `dxc`.
 
 ```bash
-npm install && npm run build && npm link
-dxc harita     # bir kez: depoları tara, haritayı üret
-dxc            # herhangi bir klasörde: Claude'u haritayla başlat
+npm install -g doguxclaude
+dxc
 ```
+
+Kurulum yok, yapılandırma yok, komut ezberi yok. İlk `dxc` depoları tarar ve haritayı
+çıkarır (bir kez, ~38 sn). Sonraki her açılış **50 ms**.
 
 ## Ne yapıyor
 
