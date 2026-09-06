@@ -3,5 +3,6 @@ dist/
 .DS_Store
 
 # Makineye özel tarama çıktıları (ev dizinindeki dosya adları)
-agac-tam.md
-agac-suzulmus.md
+depolar.md
+klasor-adlari.txt
+ozetle-deneme.py

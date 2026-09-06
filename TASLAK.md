@@ -107,3 +107,69 @@ Aşama 1'de hafıza nerede dursun: kullanıcıya özel tek yerde (`~/.doguxclaud
 **Açık soru:** `browser-farm` klasörünün `.git`'i yok, `package.json`'ı var. Yalnız git'e bakarsak kaçırıyoruz. `package.json`, `Cargo.toml`, `go.mod`, `pyproject.toml` gibi manifest dosyaları da sinyal sayılsın mı?
 
 **Neden bu katman gerekli:** 470 bayt her oturuma yüklenebilir ve 4 ms'de yeniden üretilir. Kaydetmeye bile gerek yok, bayatlama diye bir şey olmaz.
+
+## Karar 2 — Bir deponun içi nasıl özetlenir (ağırlığa göre kesme)
+
+**Karar:** Hive haritasını (`index.md`) bu algoritma üretir. Model çalışmaz, saf kod.
+
+### Üç kural
+
+1. **Hangi dosyalar sayılır: git'e sor.** `git ls-files` yalnız izlenen dosyaları verir; `node_modules`, `dist`, `target` kendiliğinden düşer. Ayrı süzgeç listesi yazılmaz, bakımı da gerekmez.
+2. **Küçük klasörü açma.** Her klasörün altındaki toplam dosya sayısı = ağırlığı. Ağırlığı toplamın **%2**'sinden azsa içine inilmez; yalnız adı ve sayısı yazılır. (Eşik: `max(3, toplam/50)`.)
+3. **Çok sayıda küçük kardeşi tek satıra topla.** Yan yana **4**'ten fazla küçük klasör varsa tek tek yazılmaz:
+   `… 27 klasör daha (52 dosya): task-dispatcher, audit, auth…`
+
+### Neden sabit derinlik değil
+
+Bir projede önemli şey 2. seviyede, başkasında 5. seviyede olur. Ağırlık ikisini de doğru bulur. Sabit derinlik birini kesip diğerini şişirir.
+
+### Ölçüm (10 depo, bu makine)
+
+| Depo | Dosya | Çıktı satırı | Token |
+|---|---|---|---|
+| `Projects/dogukan/harness` | 7.466 | 85 | 575 |
+| `Projects/dijji-ai` | 1.120 | 72 | 499 |
+| `Projects/dijji-ai-on-prem` | 326 | 55 | 329 |
+| `Projects/dijji-onprem` | 246 | 41 | 317 |
+| `Projects/fujisan-dijji` | 135 | 49 | 241 |
+| `Desktop/idea-to-product-blueprint` | 86 | 59 | 309 |
+| `Projects/dogukanSahin` | 71 | 17 | 88 |
+| `Projects/cozdukce` | 28 | 14 | 58 |
+| `Projects/dijji-mobile-poc/app` | 17 | 12 | 39 |
+| `Desktop/doguxclaude` | 4 | 4 | 11 |
+| **TOPLAM** | **9.499** | — | **2.465** |
+
+Süre: **88 ms**. Toplam çıktı **8,6 KB**.
+
+**Kilit özellik:** çıktı dosya sayısıyla büyümüyor. 7.466 dosyalık depo 575 token, 1.120 dosyalık depo 499 token. Yüz bin dosyalık depo da benzer çıkar.
+
+### Örnek çıktı
+
+```
+packages/  (999)
+  api/  (297)
+    src/  (288)
+      services/  (132)
+      repositories/  (60)
+      handlers/  (54)
+        … 27 klasör daha (52 dosya): task-dispatcher, audit, auth…
+      … 4 klasör daha (42 dosya): middleware, providers, notifications…
+    scripts/  (5)
+  web/  (281)
+    src/  (273)
+      components/  (108)
+        … 17 klasör daha (105 dosya): project, ui, common…
+```
+
+### Nerede kullanılacak
+
+`hive/index.md` (harita) bu çıktıdan üretilir:
+- **Katman 0:** depo listesi — 10 depo, 1 KB (Karar 1'deki tarama).
+- **Katman 1:** içinde bulunulan deponun özeti — ~500 token (bu algoritma).
+- Diğer dokuz deponun özeti yüklenmez; istendiğinde 9 ms'de üretilir.
+
+### Açık sorular
+
+- %2 eşiği ve 4 kardeş sayısı ölçümle seçilmedi, gözle iyi göründü. Farklı depolarda denenip ayarlanmalı.
+- Klasör adının yanına baskın dil eklensin mi (`services/ (132, TypeScript)`)? Bedava geliyor ama satırı uzatıyor.
+- Özet saklanacak mı, yoksa her oturumda yeniden mi üretilecek? 9 ms olduğu için saklamamak savunulabilir; o zaman `index.md` diye bir dosya da gerekmez.
