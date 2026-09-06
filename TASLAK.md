@@ -84,3 +84,26 @@ Aşama 1 sıfırdan yazılacak, ama bu commit'lerden parça alınabilir. Alınan
 ## Açık soru
 
 Aşama 1'de hafıza nerede dursun: kullanıcıya özel tek yerde (`~/.doguxclaude/`) mi, yoksa her projenin kendi içinde mi? Bugünkü sürüm birincisini seçmişti. Aşama 1'de karar verilecek, ikisi de denenebilir.
+
+## Karar 1 — Proje nedir (ölçümle)
+
+**Karar: git deposu = proje.** Sahip onayladı.
+
+Ölçüm (bu makine, 1.923.324 dosya/klasör):
+
+| Yöntem | Sonuç | Süre | Boyut |
+|---|---|---|---|
+| Her şeyi listele | 1.923.324 satır | 6,6 sn | 273 MB |
+| Katlanabilir tam ağaç | 253.179 klasör | 22,9 sn | 103 MB |
+| Katlanabilir süzülmüş ağaç | 14.080 klasör | 0,9 sn | 2,9 MB |
+| **Git depoları (ham)** | **101** | 6,6 sn | 8 KB |
+| Git depoları (süzülmüş) | 10 | 4 ms | 238 bayt |
+| Erken duran çok sinyalli tarayıcı | 11 | 4 ms | 470 bayt |
+
+101'den 10'a düşüren iki kural:
+1. Nokta ile başlayan klasörlere girme (`.dijji`, `.claude`, `.codex` araç üretimi depolar tutuyor).
+2. Bir depo bulunca içine inme (`Projects/dijji-onprem/rust-harness/target/ans-wd` bir derleme çıktısı).
+
+**Açık soru:** `browser-farm` klasörünün `.git`'i yok, `package.json`'ı var. Yalnız git'e bakarsak kaçırıyoruz. `package.json`, `Cargo.toml`, `go.mod`, `pyproject.toml` gibi manifest dosyaları da sinyal sayılsın mı?
+
+**Neden bu katman gerekli:** 470 bayt her oturuma yüklenebilir ve 4 ms'de yeniden üretilir. Kaydetmeye bile gerek yok, bayatlama diye bir şey olmaz.

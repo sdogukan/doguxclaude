@@ -1,3 +1,7 @@
 node_modules/
 dist/
 .DS_Store
+
+# Makineye özel tarama çıktıları (ev dizinindeki dosya adları)
+agac-tam.md
+agac-suzulmus.md
