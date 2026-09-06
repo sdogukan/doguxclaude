@@ -14,15 +14,17 @@
 </p>
 
 ```
-╭──────────────────┬──────────────────┬──────────────────┬──────────────────╮
-│                  │                  │                  │                  │
-│       %35        │       %35        │       %58        │      SIFIR       │
-│  DAHA AZ TOKEN   │    DAHA HIZLI    │   HAFIZAYLA AZ   │   AYAR DOSYASI   │
-│                  │                  │                  │                  │
-│    107K → 70K    │  22,0 → 14,3 sn  │   305K → 129K    │   hiçbir şeye    │
-│                  │                  │                  │     dokunmaz     │
-╰──────────────────┴──────────────────┴──────────────────┴──────────────────╯
-        harita + yapı: 3 senaryo · hafıza: "nerede kaldım" · ikişer koşu     
+╭────────────────────────┬────────────────────────┬────────────────────────╮
+│    "BU DEPO NEDİR"     │    "NEREDE KALDIM"     │      HER AÇILIŞTA      │
+│       sorusunda        │       sorusunda        │                        │
+│                        │                        │                        │
+│          %35           │          %58           │         SIFIR          │
+│     DAHA AZ TOKEN      │     DAHA AZ TOKEN      │     MODEL ÇAĞRISI      │
+│     %35 DAHA HIZLI     │     %47 DAHA HIZLI     │         250 ms         │
+│                        │                        │                        │
+│     harita + yapı      │         hafıza         │    harita güncelse     │
+╰────────────────────────┴────────────────────────┴────────────────────────╯
+             aynı sorular, dxc ile ve dxc olmadan · ikişer koşu             
 ```
 
 ```bash
@@ -110,10 +112,10 @@ Yapı bloğu kök dosyaları **ada ada** yazar. Artık tahmin etmiyor.
 
 Aynı sorular, `dxc` ile ve `dxc` olmadan, her biri ikişer koşu.
 
-| | Token | Süre | Tur |
+| Soru | Token | Süre | Tur |
 |---|---|---|---|
-| **Harita + yapı** — "bu depo nedir, nerede" | 107K → **70K** · %35 az | 22,0 → **14,3 sn** · %35 hızlı | 5,8 → 4,5 |
-| **Hafıza** — "nerede kalmıştım" | 305K → **129K** · %58 az | 75,3 → **40,2 sn** · %47 hızlı | 17,0 → 8,5 |
+| "Bu depo nedir, nerede" <br><sub>harita + yapı sayesinde</sub> | 107K → **70K** · %35 az | 22,0 → **14,3 sn** · %35 hızlı | 5,8 → 4,5 |
+| "Nerede kalmıştım" <br><sub>hafıza sayesinde</sub> | 305K → **129K** · %58 az | 75,3 → **40,2 sn** · %47 hızlı | 17,0 → 8,5 |
 
 Hafızasız oturumda model ne yaptığını **dosyalardan kazıyor**: git kayıtlarına
 bakıyor, dosya saatlerine bakıyor, README'yi, tasarım notlarını ve kaynak
