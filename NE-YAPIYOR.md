@@ -66,11 +66,11 @@ toplam yaklaşık 4.000 token; pratikte bir iki depo girer.
 Kuralın "adı geçen depo" olmasının sebebi ölçümdür. Önce "bulunduğun depo" diye
 yazılmıştı ve işe yaramadı: sen bir depoyu sorduğunda model henüz orada değildir,
 oraya cevap verirken girer. Yapı hep bir istem geç geliyordu ve o istemde artık
-gereksizdi. Canlı oturumda cozdukce yapısı dijji-ai sorulurken, dijji-ai yapısı
+gereksizdi. Canlı oturumda web-app yapısı api-platform sorulurken, api-platform yapısı
 oturum kimliği sorulurken geldi; ikisi de boşa gitti.
 
-Ad eşleşmesi Türkçe harfe duyarsızdır: sen "çözdükçe" yazarsın, klasör
-"cozdukce"dir, ikisi eşleşir. Üç harften kısa adlar eşleşmez ki her cümleye
+Ad eşleşmesi Türkçe harfe duyarsızdır: sen "öğrenci-portalı" yazarsın, klasör
+"ogrenci-portali"dir, ikisi eşleşir. Üç harften kısa adlar eşleşmez ki her cümleye
 takılmasın.
 
 Kanca `claude --settings` ile geçici olarak tanıtılır. Senin
@@ -110,9 +110,9 @@ depoda hiçbir şey görünmez. Oran olunca çıktı dosya sayısıyla büyümez
 
 | depo | dosya | eşik | satır |
 |---|---|---|---|
-| cozdukce | 28 | 3 | 17 |
-| dijji-onprem | 246 | 4 | 44 |
-| dijji-ai | 1.120 | 22 | 75 |
+| web-app | 28 | 3 | 17 |
+| data-service | 246 | 4 | 44 |
+| api-platform | 1.120 | 22 | 75 |
 
 Kırk kat dosya, dört kat satır.
 

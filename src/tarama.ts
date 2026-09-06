@@ -1,7 +1,7 @@
 /** Makinedeki git depolarını bulur.
  *
  *  İki kural, ölçümle seçildi (ham tarama 101 sonuç veriyordu, bu ikisi 10'a indiriyor):
- *  1. Nokta ile başlayan klasörlere girme — araç üretimi depolar orada (.dijji, .claude).
+ *  1. Nokta ile başlayan klasörlere girme — araç üretimi depolar orada (.araclar, .claude).
  *  2. Bir depo bulunca içine inme — bir projenin içindeki derleme çıktısı da depo olabilir.
  *  Bu makinede: 327 klasör tarandı, 10 depo, 9 ms. */
 import { readdirSync } from 'node:fs';

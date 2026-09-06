@@ -16,8 +16,6 @@ $ npm install -g doguxclaude
 $ dxc
 ```
 
-```
-
  ██████╗  ██╗  ██╗  ██████╗
  ██╔══██╗ ╚██╗██╔╝ ██╔════╝
  ██║  ██║  ╚███╔╝  ██║
@@ -27,13 +25,13 @@ $ dxc
 
    dogu x claude  · depo haritası · Dogu X Vibes
 
- ╭───────────────────────────────────────────────╮
- │ ▸ 11 depo tarandı 220 ms                      │
- │ + Projects/cozdukce yeni depo                 │
- │ + Projects/dijji-ai yeni depo                 │
- │ ~ Desktop/doguxclaude yapısı değişti          │
- │ ▸ buradasın: dijji-ai                         │
- ╰───────────────────────────────────────────────╯
+ ╭──────────────────────────────────────╮
+ │ ▸ 11 depo tarandı 220 ms             │
+ │ + Projects/web-app yeni depo         │
+ │ + Projects/api-platform yeni depo    │
+ │ ~ Desktop/doguxclaude yapısı değişti │
+ │ ▸ buradasın: api-platform            │
+ ╰──────────────────────────────────────╯
  ✔ claude başlatılıyor 187 ms
 ```
 
@@ -49,8 +47,8 @@ Ask Claude Code about a repo and it goes looking. Measured in real sessions:
 
 | Question | Tool calls | Output read | Result |
 |---|---|---|---|
-| "one sentence about cozdukce" | 3 | 10,494 B | ran `find` over the tree |
-| "one sentence about dijji-ai" | 2 | 5,031 B | guessed `README.md`, got exit code 1 |
+| "one sentence about web-app" | 3 | 10,494 B | ran `find` over the tree |
+| "one sentence about api-platform" | 2 | 5,031 B | guessed `README.md`, got exit code 1 |
 
 That repo has no `README.md`. It has `CLAUDE.md`. The agent had no way to know.
 
@@ -107,8 +105,8 @@ Claude Code'a bir depoyu sorduğunda aramaya çıkıyor. Gerçek oturumlarda öl
 
 | Soru | Araç çağrısı | Okunan çıktı | Sonuç |
 |---|---|---|---|
-| "cozdukce tek cümle" | 3 | 10.494 B | ağacı `find` ile taradı |
-| "dijji-ai tek cümle" | 2 | 5.031 B | `README.md` tahmin etti, hata aldı |
+| "web-app tek cümle" | 3 | 10.494 B | ağacı `find` ile taradı |
+| "api-platform tek cümle" | 2 | 5.031 B | `README.md` tahmin etti, hata aldı |
 
 O depoda `README.md` yok. `CLAUDE.md` var. Ajanın bunu bilmesinin yolu yoktu.
 

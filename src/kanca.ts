@@ -3,12 +3,12 @@
  *  Neden gerekli (üç canlı oturumda ölçüldü): açılışta enjekte edilen yapı,
  *  `dxc`'nin çalıştırıldığı klasöre aittir ve oturum boyunca sabit kalır.
  *  Ev dizininden açılan oturumda ajan bir projeye girince yapıyı baştan
- *  keşfetti; dijji-ai'de olmayan README.md'yi tahmin edip hata aldı.
+ *  keşfetti; api-platform'de olmayan README.md'yi tahmin edip hata aldı.
  *
  *  Kural neden "bulunduğun depo" DEĞİL: ölçüldü, işe yaramıyor. Sen bir depoyu
  *  sorduğunda model henüz orada değildir, oraya cevap verirken girer. Bulunduğun
  *  klasöre bakan kanca yapıyı hep bir istem geç verir ve o istemde artık gereksizdir.
- *  (6b263b1d: cozdukce yapısı dijji-ai sorulurken, dijji-ai yapısı oturum kimliği
+ *  (web-app yapısı api-platform sorulurken, api-platform yapısı oturum kimliği
  *  sorulurken geldi. İkisi de boşa gitti.)
  *
  *  Bu yüzden iki kaynağa birden bakılır:
@@ -49,7 +49,7 @@ function eskileriSil(): void {
   } catch { /* dizin yoksa yapacak iş yok */ }
 }
 
-/** Türkçe harfleri sadeleştirir: kullanıcı "çözdükçe" yazar, klasör "cozdukce"dir.
+/** Türkçe harfleri sadeleştirir: kullanıcı "web-app" yazar, klasör "web-app"dir.
  *
  *  Harf harf değiştirme yetmiyor: JavaScript Türkçe yerel ayarı kullanmadığı için
  *  'İ'.toLowerCase() iki kod noktası üretir (i + birleşik nokta) ve eşleşme bozulur.

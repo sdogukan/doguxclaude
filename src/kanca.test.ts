@@ -21,13 +21,14 @@ function depoKur(ad: string): string {
 }
 
 test('Türkçe harfler sadeleşir', () => {
-  assert.equal(sadelestir('Çözdükçe'), 'cozdukce');
-  assert.equal(sadelestir('DİJJİ-AI'), 'dijji-ai');
+  assert.equal(sadelestir('Öğrenci-Portalı'), 'ogrenci-portali');
+  // Büyük İ tuzağı: JavaScript'te 'İ'.toLowerCase() iki kod noktası üretir.
+  assert.equal(sadelestir('İSTANBUL-API'), 'istanbul-api');
 });
 
-test('istemde adı geçen depo bulunur', () => {
-  const d = ['/x/cozdukce', '/x/dijji-ai'];
-  assert.deepEqual(istemdekiDepolar('çözdükçe reposunda ne var', d), ['/x/cozdukce']);
+test('Türkçe yazılan ad, ASCII klasör adıyla eşleşir', () => {
+  const d = ['/x/ogrenci-portali', '/x/api-platform'];
+  assert.deepEqual(istemdekiDepolar('öğrenci-portalı reposunda ne var', d), ['/x/ogrenci-portali']);
   assert.deepEqual(istemdekiDepolar('hiçbiri', d), []);
 });
 
@@ -36,9 +37,9 @@ test('iki harflik adlar eşleşmez, her cümleye takılmasın', () => {
 });
 
 test('sorulan deponun yapısı yazılır, bulunduğun yer başka olsa da', () => {
-  const depo = depoKur('cozdukce');
+  const depo = depoKur('web-app');
   const bos = mkdtempSync(join(tmpdir(), 'dxc-bos-'));
-  const k = karar('çözdükçe tek cümle', bos, new Set(), [depo]);
+  const k = karar('web-app tek cümle', bos, new Set(), [depo]);
   assert.deepEqual(k.eklenen, [depo]);
   assert.ok(k.blok[0]!.includes('README.md'), 'kök dosyalar ada ada olmalı');
 });
@@ -50,15 +51,15 @@ test('içinde bulunulan depo da yazılır', () => {
 });
 
 test('aynı depo oturumda ikinci kez yazılmaz', () => {
-  const depo = depoKur('cozdukce');
-  const k = karar('çözdükçe tek cümle', depo, new Set([depo]), [depo]);
+  const depo = depoKur('web-app');
+  const k = karar('web-app tek cümle', depo, new Set([depo]), [depo]);
   assert.deepEqual(k.eklenen, []);
   assert.deepEqual(k.blok, []);
 });
 
 test('hem adı geçen hem bulunulan aynı depoysa bir kez yazılır', () => {
-  const depo = depoKur('cozdukce');
-  const k = karar('çözdükçe', depo, new Set(), [depo]);
+  const depo = depoKur('web-app');
+  const k = karar('web-app', depo, new Set(), [depo]);
   assert.equal(k.eklenen.length, 1);
 });
 

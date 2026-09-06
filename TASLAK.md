@@ -101,8 +101,8 @@ Aşama 1'de hafıza nerede dursun: kullanıcıya özel tek yerde (`~/.doguxclaud
 | Erken duran çok sinyalli tarayıcı | 11 | 4 ms | 470 bayt |
 
 101'den 10'a düşüren iki kural:
-1. Nokta ile başlayan klasörlere girme (`.dijji`, `.claude`, `.codex` araç üretimi depolar tutuyor).
-2. Bir depo bulunca içine inme (`Projects/dijji-onprem/rust-harness/target/ans-wd` bir derleme çıktısı).
+1. Nokta ile başlayan klasörlere girme (`.araclar`, `.claude`, `.codex` araç üretimi depolar tutuyor).
+2. Bir depo bulunca içine inme (`Projects/data-service/rust-harness/target/ans-wd` bir derleme çıktısı).
 
 **Açık soru:** `browser-farm` klasörünün `.git`'i yok, `package.json`'ı var. Yalnız git'e bakarsak kaçırıyoruz. `package.json`, `Cargo.toml`, `go.mod`, `pyproject.toml` gibi manifest dosyaları da sinyal sayılsın mı?
 
@@ -127,15 +127,15 @@ Bir projede önemli şey 2. seviyede, başkasında 5. seviyede olur. Ağırlık 
 
 | Depo | Dosya | Çıktı satırı | Token |
 |---|---|---|---|
-| `Projects/dogukan/harness` | 7.466 | 85 | 575 |
-| `Projects/dijji-ai` | 1.120 | 72 | 499 |
-| `Projects/dijji-ai-on-prem` | 326 | 55 | 329 |
-| `Projects/dijji-onprem` | 246 | 41 | 317 |
-| `Projects/fujisan-dijji` | 135 | 49 | 241 |
-| `Desktop/idea-to-product-blueprint` | 86 | 59 | 309 |
-| `Projects/dogukanSahin` | 71 | 17 | 88 |
-| `Projects/cozdukce` | 28 | 14 | 58 |
-| `Projects/dijji-mobile-poc/app` | 17 | 12 | 39 |
+| `Projects/tooling` | 7.466 | 85 | 575 |
+| `Projects/api-platform` | 1.120 | 72 | 499 |
+| `Projects/api-platform-onprem` | 326 | 55 | 329 |
+| `Projects/data-service` | 246 | 41 | 317 |
+| `Projects/dealer-admin` | 135 | 49 | 241 |
+| `Desktop/process-template` | 86 | 59 | 309 |
+| `Projects/notes` | 71 | 17 | 88 |
+| `Projects/web-app` | 28 | 14 | 58 |
+| `Projects/mobile-poc/app` | 17 | 12 | 39 |
 | `Desktop/doguxclaude` | 4 | 4 | 11 |
 | **TOPLAM** | **9.499** | — | **2.465** |
 
