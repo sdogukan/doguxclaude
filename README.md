@@ -9,7 +9,7 @@
   <a href="https://www.npmjs.com/package/doguxclaude"><img src="https://img.shields.io/npm/v/doguxclaude?color=a855f7&labelColor=1a1a2e&label=npm" alt="npm"></a>
   <img src="https://img.shields.io/badge/node-%E2%89%A522-22d3ee?labelColor=1a1a2e" alt="node">
   <img src="https://img.shields.io/badge/token-%2535%20daha%20az-a855f7?labelColor=1a1a2e" alt="%35 daha az token">
-  <img src="https://img.shields.io/badge/haf%C4%B1za-%2558%20daha%20az-22d3ee-22d3ee?labelColor=1a1a2e" alt="hafıza %58 daha az">
+  <img src="https://img.shields.io/badge/haf%C4%B1za-%2558%20daha%20az-22d3ee?labelColor=1a1a2e" alt="hafıza %58 daha az">
   <img src="https://img.shields.io/badge/lisans-MIT-22d3ee?labelColor=1a1a2e" alt="MIT">
 </p>
 
