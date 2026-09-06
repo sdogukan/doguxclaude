@@ -8,7 +8,7 @@
  *  var olanlara dokunulmaz. Silinen depo haritadan düşer. */
 import { spawnSync } from 'node:child_process';
 import { homedir } from 'node:os';
-import { banner, bekle, calisiyor, ok, satir, sure, tik, uyari, vurgu } from './ekran.js';
+import { banner, bekle, calisiyor, kutuBas, ok, satir, sure, tik, uyari, vurgu } from './ekran.js';
 import { depoOzeti } from './ozet.js';
 import { Depo, depoBilgisi, depolariBul } from './tarama.js';
 import { durumOku, durumYaz, sekilIzi } from './durum.js';
@@ -63,7 +63,9 @@ export interface TazelemeSonucu {
 }
 
 /** Depoları tarar, haritayı gerekiyorsa tazeler. `zorla` ile tüm açıklamalar yeniden yazdırılır. */
-export async function haritaTazele(secenek: { zorla?: boolean; modelsiz?: boolean; sessiz?: boolean } = {}): Promise<TazelemeSonucu> {
+export async function haritaTazele(
+  secenek: { zorla?: boolean; modelsiz?: boolean; sessiz?: boolean; ekSatir?: string } = {},
+): Promise<TazelemeSonucu> {
   const t0 = Date.now();
   const ev = homedir();
   const depolar = depolariBul(ev).map((y) => depoBilgisi(y, ev));
@@ -96,6 +98,12 @@ export async function haritaTazele(secenek: { zorla?: boolean; modelsiz?: boolea
     for (const d of dusen) satir(`${uyari('−')} ${d} artık yok, haritadan düştü`);
     for (const d of sekliDegisen) satir(`${uyari('~')} ${vurgu(d)} yapısı değişti`);
     for (const d of yeniDepo) satir(`${uyari('+')} ${vurgu(d)} yeni depo`);
+  }
+
+  // Kutu, model çağrısından ÖNCE basılır: kullanıcı beklerken ne olduğunu görsün.
+  if (!secenek.sessiz) {
+    if (secenek.ekSatir) satir(secenek.ekSatir);
+    kutuBas();
   }
 
   let modelMs = 0;

@@ -6,7 +6,7 @@ import { spawn } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { basename, join, resolve } from 'node:path';
 import { haritaOku, haritaTazele } from './harita.js';
-import { kisaBaslik, kutuBas, ok, satir, son, stdinBosalt, sure, tik, vurgu } from './ekran.js';
+import { kisaBaslik, ok, son, stdinBosalt, sure, tik, vurgu } from './ekran.js';
 import { depoOzeti } from './ozet.js';
 import { iceridekiDepo } from './tarama.js';
 import { hata, HARITA_YOLU, yaz } from './util.js';
@@ -49,7 +49,6 @@ async function komutHarita(acik: Set<string>): Promise<number> {
     console.log(h); return 0;
   }
   const s = await haritaTazele({ zorla: acik.has('zorla'), modelsiz: acik.has('modelsiz') });
-  kutuBas();
   son(`${tik()} harita ${vurgu(HARITA_YOLU)} ${sure(s.kodMs + s.modelMs)}`);
   return 0;
 }
@@ -68,17 +67,17 @@ const YONERGE = [
  *  Kullanıcı hiçbir şey kurmaz, hiçbir komut ezberlemez: terminale `dxc` yazar. */
 let sonTazeleme = { isVar: false, depoSayisi: 0 };
 
-async function haritaSagla(): Promise<string> {
-  const s = await haritaTazele();
+async function haritaSagla(ekSatir?: string): Promise<string> {
+  const s = await haritaTazele(ekSatir === undefined ? {} : { ekSatir });
   sonTazeleme = { isVar: s.isVar, depoSayisi: s.depolar.length };
   return (haritaOku() ?? '').trim();
 }
 
-async function baglam(): Promise<string> {
+async function baglam(ekSatir?: string): Promise<string> {
   const cwd = process.cwd();
   const depo = iceridekiDepo(cwd);
   const parcalar: string[] = [];
-  const harita = await haritaSagla();
+  const harita = await haritaSagla(ekSatir);
   if (harita) parcalar.push(harita);
   else parcalar.push('# Harita\n\nÜretilemedi.');
 
@@ -95,15 +94,15 @@ async function baglam(): Promise<string> {
  *  0,2 sn'lik koşuyu altı satırlık banner ile boğmak istemiyoruz. */
 async function baslat(argv: string[], acik: Set<string>): Promise<number> {
   const t0 = Date.now();
-  const metin = await baglam();   // satırlar burada birikir, kip sonra belli olur
+  // Nerede olduğumuz ucuz bilgi: kutuya girsin diye model çağrısından önce hesaplanır.
   const depo = iceridekiDepo(process.cwd());
-  // BULUNDUĞUN klasörü anlatır, haritadaki depoları değil: ikisi karışmasın.
   const nerede = depo ? basename(depo) : (basename(process.cwd()) || process.cwd());
+  const buradaSatiri = `${ok()} buradasın: ${vurgu(nerede)}${depo ? '' : GIT_YOK}`;
+
+  const metin = await baglam(buradaSatiri);
   const gecen = Date.now() - t0;
 
   if (sonTazeleme.isVar) {
-    satir(`${ok()} buradasın: ${vurgu(nerede)}${depo ? '' : GIT_YOK}`);
-    kutuBas();
     son(`${tik()} ${acik.has('kuru') ? 'kuru koşu' : 'claude başlatılıyor'} ${sure(gecen)}`);
   } else {
     kisaBaslik(`${vurgu(String(sonTazeleme.depoSayisi))} depo · ${vurgu(nerede)}${depo ? '' : GIT_YOK}`, gecen);
