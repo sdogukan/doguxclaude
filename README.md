@@ -14,18 +14,35 @@
 </p>
 
 ```
-╭────────────────────────┬────────────────────────┬────────────────────────╮
-│    "BU DEPO NEDİR"     │    "NEREDE KALDIM"     │      HER AÇILIŞTA      │
-│       sorusunda        │       sorusunda        │                        │
-│                        │                        │                        │
-│          %35           │          %58           │         SIFIR          │
-│     DAHA AZ TOKEN      │     DAHA AZ TOKEN      │     MODEL ÇAĞRISI      │
-│     %35 DAHA HIZLI     │     %47 DAHA HIZLI     │         250 ms         │
-│                        │                        │                        │
-│     harita + yapı      │         hafıza         │    harita güncelse     │
-╰────────────────────────┴────────────────────────┴────────────────────────╯
-             aynı sorular, dxc ile ve dxc olmadan · ikişer koşu             
+
+
+ ███████╗  █████╗  ██╗ ██╗
+ ██╔════╝ ██╔══██╗ ╚═╝██╔╝    DAHA AZ TOKEN
+ ███████╗ ╚█████╔╝   ██╔╝     "nerede kaldım" sorusunda
+ ╚════██║ ██╔══██╗  ██╔╝      305K → 129K  ·  hafıza sayesinde
+ ███████║ ╚█████╔╝ ██╔╝██╗
+ ╚══════╝  ╚════╝  ╚═╝ ╚═╝
+
+
+
+ ██╗  ██╗ ███████╗ ██╗ ██╗
+ ██║  ██║ ╚════██║ ╚═╝██╔╝    DAHA HIZLI
+ ███████║     ██╔╝   ██╔╝     "nerede kaldım" sorusunda
+ ╚════██║    ██╔╝   ██╔╝      75 sn → 40 sn  ·  hafıza sayesinde
+      ██║    ██║   ██╔╝██╗
+      ╚═╝    ╚═╝   ╚═╝ ╚═╝
+
+
+
+ ██████╗  ███████╗ ██╗ ██╗
+ ╚════██╗ ██╔════╝ ╚═╝██╔╝    DAHA AZ TOKEN
+  █████╔╝ ███████╗   ██╔╝     "bu depo nedir" sorusunda
+  ╚═══██╗ ╚════██║  ██╔╝      107K → 70K  ·  harita + yapı sayesinde
+ ██████╔╝ ███████║ ██╔╝██╗
+ ╚═════╝  ╚══════╝ ╚═╝ ╚═╝
 ```
+
+<p align="center"><sub>aynı sorular, <code>dxc</code> ile ve <code>dxc</code> olmadan · ikişer koşu · <a href="#ölçüm">ölçüm ayrıntısı</a></sub></p>
 
 ```bash
 npm install -g doguxclaude
@@ -52,7 +69,9 @@ dxc
  ✔ claude başlatılıyor 187 ms
 ```
 
-<p align="center"><sub>İlk açılış haritayı çıkarır. Sonraki her açılış tek satır, çeyrek saniye.</sub></p>
+<p align="center">
+  <b>Her açılışta sıfır model çağrısı.</b> Harita güncelse tarama 250 ms, oturum açılır.
+</p>
 
 ---
 
@@ -109,6 +128,7 @@ var. Bilmesinin bir yolu yoktu.
 Yapı bloğu kök dosyaları **ada ada** yazar. Artık tahmin etmiyor.
 
 ### Ölçüm
+<a id="ölçüm"></a>
 
 Aynı sorular, `dxc` ile ve `dxc` olmadan, her biri ikişer koşu.
 
