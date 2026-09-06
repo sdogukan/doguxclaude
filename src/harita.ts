@@ -12,6 +12,7 @@ import { banner, bekle, calisiyor, kutuBas, ok, satir, sure, tik, uyari, vurgu }
 import { depoOzeti } from './ozet.js';
 import { Depo, depoBilgisi, depolariBul } from './tarama.js';
 import { durumOku, durumYaz, sekilIzi } from './durum.js';
+import { birlestir, mevcutHafiza } from './hafiza.js';
 import { bugun, HARITA_YOLU, oku, yaz } from './util.js';
 
 export interface HaritaSatiri { goreli: string; aciklama: string; dosya: number; sonDegisiklik: string }
@@ -131,7 +132,9 @@ export async function haritaTazele(
       dosya: ozetler.get(d.goreli)!.dosyaSayisi,
       sonDegisiklik: d.sonDegisiklik,
     }));
-    yaz(HARITA_YOLU, haritaMetni(satirlar));
+    // Hafıza bölümü ÖNCE okunur ve olduğu gibi geri konur: harita tazelenirken
+    // oturum satırları silinmemeli. İki yazıcı, iki bölüm, üzerine yazma yok.
+    yaz(HARITA_YOLU, birlestir(haritaMetni(satirlar), mevcutHafiza()));
   }
   // Parmak izleri ayrı dosyada: index.md her oturuma yükleniyor, makine verisi oraya girmez.
   durumYaz({ surum: 1, depolar: Object.fromEntries(depolar.map((d) => [d.goreli, { sekil: izler.get(d.goreli)! }])) });

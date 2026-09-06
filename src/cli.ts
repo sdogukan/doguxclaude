@@ -3,16 +3,18 @@
  *
  *  İnsan yüzeyi tek komut: `dxc`. Diğerleri tanı içindir, ezberlenmesi gerekmez. */
 import { spawn } from 'node:child_process';
+import { rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { basename, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { depoBlogu } from './baglam.js';
 import { haritaOku, haritaTazele } from './harita.js';
-import { ACILIS_DEPO, kancaCalistir } from './kanca.js';
+import { konusmaKuyrugu, oturumCumlesi, oturumYaz } from './hafiza.js';
+import { ACILIS_DEPO, kancaCalistir, KOSU, kosuYolu } from './kanca.js';
 import { kisaBaslik, ok, son, stdinBosalt, sure, tik, vurgu } from './ekran.js';
 import { depoOzeti } from './ozet.js';
 import { iceridekiDepo } from './tarama.js';
-import { hata, HARITA_YOLU, yaz } from './util.js';
+import { hata, HARITA_YOLU, oku, yaz } from './util.js';
 
 /** Git deposu olmayan klasör için soluk not. */
 const GIT_YOK = ' \x1b[2m(git deposu değil, yapı verilmedi)\x1b[0m';
@@ -118,15 +120,38 @@ async function baslat(argv: string[], acik: Set<string>): Promise<number> {
   // ile claude'a gider: kazara mesaj gönderilmiş olur. Devretmeden önce temizlenir.
   const atilan = stdinBosalt();
   if (atilan) process.stderr.write(` ${atilan} karakterlik tuş girişi atıldı (bekleme sırasında yazılmıştı)\n`);
+  const kosu = `${process.pid}-${Date.now()}`;
   return await new Promise((coz) => {
     const c = spawn('claude', ['--append-system-prompt-file', yol, '--settings', kancaAyari(), ...claudeBayraklari], {
       stdio: 'inherit',
-      // Kanca ilk istemde açılışta verilen depoyu tekrar yazmasın diye devredilir.
-      env: { ...process.env, [ACILIS_DEPO]: depo ?? '' },
+      // ACILIS_DEPO: kanca ilk istemde açılışta verilen depoyu tekrar yazmasın.
+      // KOSU: kanca oturumun kayıt dosyasını bu kimlikle bıraksın, çıkışta okunsun.
+      env: { ...process.env, [ACILIS_DEPO]: depo ?? '', [KOSU]: kosu },
     });
     c.on('error', (e) => { console.error(hata('dxc', `claude başlatılamadı (${e.message})`, 'Claude CLI kurulu mu')); coz(127); });
-    c.on('exit', (k) => coz(k ?? 0));
+    c.on('exit', (k) => { hafizayiArkadaYaz(kosu, nerede); coz(k ?? 0); });
   });
+}
+
+/** Oturum kapanınca hafıza satırını ARKA PLANDA yazdırır: terminal anında geri döner.
+ *  Kanca hiç çalışmadıysa kayıt yolu yoktur; o zaman yazacak bir şey de yoktur. */
+function hafizayiArkadaYaz(kosu: string, proje: string): void {
+  const isaret = kosuYolu(kosu);
+  const kayit = oku(isaret);
+  try { rmSync(isaret, { force: true }); } catch { /* yoksa sorun değil */ }
+  if (!kayit) return;
+  const cocuk = spawn(process.execPath, [fileURLToPath(import.meta.url), 'hafiza-yaz', kayit.trim(), proje],
+    { detached: true, stdio: 'ignore' });
+  cocuk.unref();
+}
+
+/** Arka plan komutu: konuşmayı özetleyip haritanın hafıza bölümüne ekler. */
+function komutHafizaYaz(konum: string[]): number {
+  const [kayit, proje] = konum;
+  if (!kayit || !proje) return 1;
+  const cumle = oturumCumlesi(konusmaKuyrugu(kayit));
+  if (cumle) oturumYaz(proje, cumle);
+  return 0;
 }
 
 async function ana(): Promise<number> {
@@ -136,6 +161,7 @@ async function ana(): Promise<number> {
   // hiçbir koşulda oturumu bozmaz, her hata yutulur.
   if (ilk === 'kanca') { try { await kancaCalistir(); } catch { /* sessiz */ } return 0; }
   if (ilk === 'help' || ilk === '--help' || ilk === '-h') { console.log(KULLANIM); return 0; }
+  if (ilk === 'hafiza-yaz') return komutHafizaYaz(argv.slice(1));
   const bilinen = new Set(['harita', 'ozet']);
   const komut = ilk && bilinen.has(ilk) ? ilk : null;
   const { acik, konum } = bayraklar(komut ? argv.slice(1) : argv);

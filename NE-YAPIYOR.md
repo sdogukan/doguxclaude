@@ -1,7 +1,7 @@
 # Ne yapıyor
 
-dxc iki şey yapar. Biri **harita**, öbürü **yapı enjeksiyonu**. İkisi de aynı
-kod tarafından, aynı kurallarla üretilir.
+dxc üç şey yapar: **harita**, **yapı enjeksiyonu**, **hafıza**.
+Harita nerede ne olduğunu, yapı içinde ne olduğunu, hafıza ne konuşulduğunu söyler.
 
 ---
 
@@ -90,6 +90,54 @@ Bu yönerge ölçümle eklendi: aynı soruda ajanın araç çağrısı 6'dan 1'e
 
 ---
 
+## 3. Hafıza — `index.md` içinde, haritanın altında
+
+### Nedir
+
+Son otuz oturum, her biri tek cümle. Haritayla aynı dosyada, `## Hafıza`
+başlığının altında durur, o yüzden ayrıca yüklenmesi gerekmez.
+
+### Nasıl yazılır
+
+Oturum kapanınca. `dxc` claude'u başlatıp bekleyen ana süreçtir; claude çıkınca
+kontrol ona döner ve şunu yapar:
+
+1. Oturumun kayıt dosyasını açar. Yolu tahmin etmez: kanca her istemde
+   `transcript_path` alıyor ve dxc'ye bırakıyor.
+2. Kayıttan yalnız konuşmayı çıkarır, araç çağrılarını ve çıktılarını atar.
+   Ölçüldü: kaydın yalnız yüzde 6,4'ü konuşmadır.
+3. Son 25.000 karakteri alır. "Nerede kaldık" sorusunun cevabı sondadır ve
+   girdi sınırlı kalınca çağrı da hızlı olur.
+4. Modele tek çağrı yapar, tek cümle ister. Ölçüldü: 110 KB'lık kayıt, 6,2 saniye.
+5. Cümleyi hafıza bölümünün **en üstüne** koyar. Otuzu aşan alttan düşer.
+
+Bunların hepsi **arka planda** olur. `dxc`'den çıktığın anda terminal geri gelir,
+özet sen farkına varmadan yazılır.
+
+Kanca hiç çalışmadıysa kayıt yolu yoktur ve hiçbir şey yazılmaz. Konuşulmamış
+oturuma cümle yazılmaz.
+
+### İki yazıcı, tek dosya
+
+`index.md`'ye iki ayrı yazıcı yazar ve **birbirinin bölümüne dokunmaz**:
+
+| Yazıcı | Ne zaman | Hangi bölüm |
+|---|---|---|
+| harita tazeleyici | her `dxc` çağrısında | üst bölüm |
+| çıkış yazıcısı | oturum kapanınca | `## Hafıza` altı |
+
+Harita tazeleyici dosyayı yeniden üretirken hafıza bölümünü önce okur ve olduğu
+gibi geri koyar. Çıkış yazıcısı da yalnız hafıza bölümüne satır ekler. Üzerine
+yazma olmaz.
+
+### Neden şişmez
+
+Otuz satır tavanı var. Otuz birinci gelince en eski düşer. Dosya sabit kalır.
+
+---
+
+---
+
 ## Yapı çıkarma kuralları
 
 Aynı altı kural hem harita hem enjeksiyon için geçerlidir.
@@ -116,12 +164,15 @@ depoda hiçbir şey görünmez. Oran olunca çıktı dosya sayısıyla büyümez
 
 Kırk kat dosya, dört kat satır.
 
+
+---
+
 ---
 
 ## Nerede ne duruyor
 
 | yol | ne | oturuma yüklenir mi |
 |---|---|---|
-| `~/.doguxclaude/index.md` | harita | evet |
+| `~/.doguxclaude/index.md` | harita **ve** hafıza | evet |
 | `~/.doguxclaude/durum.json` | şekil parmak izleri | hayır |
-| `~/.doguxclaude/oturum/` | oturum başına yazılmış depoların listesi | hayır |
+| `~/.doguxclaude/oturum/` | oturumda yazılmış depolar, oturum kayıt yolu | hayır |

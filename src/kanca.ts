@@ -30,6 +30,14 @@ import { KOK, oku, yaz } from './util.js';
 
 /** dxc'nin açılışta hangi depoyu enjekte ettiği; kanca aynısını tekrar yazmasın. */
 export const ACILIS_DEPO = 'DOGUXCLAUDE_ACILIS_DEPO';
+/** dxc'nin bu koşuya verdiği kimlik. Kanca, oturumun kayıt dosyasının yolunu
+ *  bu kimlikle bırakır; dxc claude'dan çıkınca oradan okuyup hafızayı yazar.
+ *  Oturum kimliğini claude üretir ve dxc bilmez, o yüzden ayrı bir kimlik gerekir. */
+export const KOSU = 'DOGUXCLAUDE_KOSU';
+
+export function kosuYolu(kosu: string): string {
+  return join(OTURUM_DIZINI, `kosu-${kosu.replace(/[^A-Za-z0-9_-]/g, '')}.txt`);
+}
 
 const OTURUM_DIZINI = join(KOK, 'oturum');
 const OMUR_GUN = 7;
@@ -99,9 +107,13 @@ export function karar(
 export async function kancaCalistir(): Promise<void> {
   let ham = '';
   for await (const parca of process.stdin) ham += parca;
-  const g = JSON.parse(ham) as { session_id?: string; cwd?: string; prompt?: string };
+  const g = JSON.parse(ham) as { session_id?: string; cwd?: string; prompt?: string; transcript_path?: string };
   const oturum = g.session_id ?? '';
   if (!oturum) return;
+
+  // Kayıt dosyasının yolunu dxc'ye bırak: çıkışta hafıza oradan yazılacak.
+  const kosu = process.env[KOSU];
+  if (kosu && g.transcript_path) yaz(kosuYolu(kosu), g.transcript_path);
 
   const yol = durumYolu(oturum);
   const yazilmis = new Set((oku(yol) ?? '').split('\n').filter(Boolean));
