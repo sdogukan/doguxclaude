@@ -3,15 +3,43 @@
   "version": "0.1.0",
   "description": "Claude Code'u makinendeki depoların haritasıyla başlatır. Harita kodla çıkarılır, tek satırlık açıklamaları model yazar.",
   "type": "module",
-  "bin": { "dxc": "dist/cli.js" },
-  "files": ["dist"],
+  "bin": {
+    "dxc": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.test.*",
+    "!dist/**/*.map"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "node --test \"dist/**/*.test.js\"",
-    "prepare": "npm run build"
+    "prepublishOnly": "npm run build && npm test"
   },
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "license": "MIT",
   "author": "Doğukan Şahin",
-  "devDependencies": { "typescript": "^5.6.0", "@types/node": "^22.0.0" }
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "@types/node": "^22.0.0"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "cli",
+    "repo-map",
+    "context",
+    "ai",
+    "developer-tools"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sdogukan/doguxclaude.git"
+  },
+  "homepage": "https://github.com/sdogukan/doguxclaude#readme",
+  "bugs": {
+    "url": "https://github.com/sdogukan/doguxclaude/issues"
+  }
 }
