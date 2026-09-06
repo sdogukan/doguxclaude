@@ -28,11 +28,18 @@
   "keywords": [
     "claude",
     "claude-code",
-    "cli",
-    "repo-map",
+    "anthropic",
+    "claude-cli",
     "context",
-    "ai",
-    "developer-tools"
+    "repo-map",
+    "codebase-map",
+    "project-context",
+    "system-prompt",
+    "ai-context",
+    "agent-memory",
+    "cli",
+    "developer-tools",
+    "monorepo"
   ],
   "repository": {
     "type": "git",
