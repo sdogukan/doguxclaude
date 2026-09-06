@@ -5,7 +5,10 @@
 import { spawn } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { basename, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { depoBlogu } from './baglam.js';
 import { haritaOku, haritaTazele } from './harita.js';
+import { ACILIS_DEPO, kancaCalistir } from './kanca.js';
 import { kisaBaslik, ok, son, stdinBosalt, sure, tik, vurgu } from './ekran.js';
 import { depoOzeti } from './ozet.js';
 import { iceridekiDepo } from './tarama.js';
@@ -53,15 +56,6 @@ async function komutHarita(acik: Set<string>): Promise<number> {
   return 0;
 }
 
-/** Enjekte edilen yapının nasıl kullanılacağı. Liste tek başına yönlendirmiyor:
- *  ölçüldü, ajan yapıyı elinde olduğu halde `ls` ile baştan keşfetti (6 araç çağrısı). */
-const YONERGE = [
-  'Aşağıdaki klasör yapısı `git ls-files` çıktısından üretildi ve günceldir.',
-  'Yapıyı öğrenmek için `ls`, `find`, `tree` çalıştırma; sayılar klasörün altındaki dosya sayısıdır.',
-  'Bu özet dosya İÇERİĞİNİ, satır sayılarını ve fonksiyon adlarını içermez; onlar gerekiyorsa doğrudan ilgili dosyayı oku.',
-  'Deponun kendi CLAUDE.md dosyası varsa geçerliliğini korur: bu özet onun yerine geçmez, yalnız yapıyı tekrar keşfetme yükünü kaldırır.',
-].join('\n');
-
 /** Her açılışta depolar taranır (9 ms, bedava) ve harita gerekiyorsa tazelenir.
  *  Yeni depo eklendiyse yalnız onun açıklaması yazdırılır; var olanlara dokunulmaz.
  *  Kullanıcı hiçbir şey kurmaz, hiçbir komut ezberlemez: terminale `dxc` yazar. */
@@ -82,12 +76,21 @@ async function baglam(ekSatir?: string): Promise<string> {
   else parcalar.push('# Harita\n\nÜretilemedi.');
 
   if (depo) {
-    const o = depoOzeti(depo);
-    parcalar.push(`\n---\n\n# Bu depo: ${basename(depo)}\n\n${depo} · ${o.dosyaSayisi} dosya\n\n${YONERGE}\n\n\`\`\`\n${o.metin}\n\`\`\``);
+    parcalar.push(`\n---\n\n${depoBlogu(depo)}`);
   } else {
     parcalar.push(`\n---\n\n# Bu klasör\n\n${cwd} — git deposu değil, yapı çıkarılmadı.`);
   }
   return parcalar.join('\n');
+}
+
+/** Kancayı claude'a tanıtan ayar. `--settings` kullanıcının kendi
+ *  `~/.claude/settings.json` dosyasının ÜSTÜNE yazmaz, yanına ekler: ölçüldü,
+ *  yalnız kanca verilerek açılan oturumda kullanıcının dil ayarı korundu.
+ *  Böylece dxc hiçbir kalıcı yapılandırma bırakmaz. */
+function kancaAyari(): string {
+  const alinti = (s: string) => `'${s.replace(/'/g, `'\\''`)}'`;
+  const komut = `${alinti(process.execPath)} ${alinti(fileURLToPath(import.meta.url))} kanca`;
+  return JSON.stringify({ hooks: { UserPromptSubmit: [{ hooks: [{ type: 'command', command: komut }] }] } });
 }
 
 /** İki kip: gerçek iş yapıldıysa tam gösteri, yapılmadıysa tek satır.
@@ -116,7 +119,11 @@ async function baslat(argv: string[], acik: Set<string>): Promise<number> {
   const atilan = stdinBosalt();
   if (atilan) process.stderr.write(` ${atilan} karakterlik tuş girişi atıldı (bekleme sırasında yazılmıştı)\n`);
   return await new Promise((coz) => {
-    const c = spawn('claude', ['--append-system-prompt-file', yol, ...claudeBayraklari], { stdio: 'inherit' });
+    const c = spawn('claude', ['--append-system-prompt-file', yol, '--settings', kancaAyari(), ...claudeBayraklari], {
+      stdio: 'inherit',
+      // Kanca ilk istemde açılışta verilen depoyu tekrar yazmasın diye devredilir.
+      env: { ...process.env, [ACILIS_DEPO]: depo ?? '' },
+    });
     c.on('error', (e) => { console.error(hata('dxc', `claude başlatılamadı (${e.message})`, 'Claude CLI kurulu mu')); coz(127); });
     c.on('exit', (k) => coz(k ?? 0));
   });
@@ -125,6 +132,9 @@ async function baslat(argv: string[], acik: Set<string>): Promise<number> {
 async function ana(): Promise<number> {
   const argv = process.argv.slice(2);
   const ilk = argv[0];
+  // Kanca claude tarafından çağrılır, insan yazmaz: yardımda görünmez ve
+  // hiçbir koşulda oturumu bozmaz, her hata yutulur.
+  if (ilk === 'kanca') { try { await kancaCalistir(); } catch { /* sessiz */ } return 0; }
   if (ilk === 'help' || ilk === '--help' || ilk === '-h') { console.log(KULLANIM); return 0; }
   const bilinen = new Set(['harita', 'ozet']);
   const komut = ilk && bilinen.has(ilk) ? ilk : null;
