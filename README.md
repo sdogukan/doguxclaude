@@ -8,9 +8,22 @@
 <p align="center">
   <a href="https://www.npmjs.com/package/doguxclaude"><img src="https://img.shields.io/npm/v/doguxclaude?color=a855f7&labelColor=1a1a2e&label=npm" alt="npm"></a>
   <img src="https://img.shields.io/badge/node-%E2%89%A522-22d3ee?labelColor=1a1a2e" alt="node">
-  <img src="https://img.shields.io/badge/ayar-s%C4%B1f%C4%B1r-a855f7?labelColor=1a1a2e" alt="sıfır ayar">
+  <img src="https://img.shields.io/badge/token-%2542%20daha%20az-a855f7?labelColor=1a1a2e" alt="%42 daha az token">
+  <img src="https://img.shields.io/badge/h%C4%B1z-%2533%20daha%20h%C4%B1zl%C4%B1-22d3ee?labelColor=1a1a2e" alt="%33 daha hızlı">
   <img src="https://img.shields.io/badge/lisans-MIT-22d3ee?labelColor=1a1a2e" alt="MIT">
 </p>
+
+```
+╭──────────────────┬──────────────────┬──────────────────╮
+│                  │                  │                  │
+│       %42        │       %33        │       %38        │
+│   DAHA AZ TOKEN  │    DAHA HIZLI    │    DAHA AZ TUR   │
+│                  │                  │                  │
+│  83.906 → 48.915 │  15,8 → 10,6 sn  │    4,3 → 2,7     │
+│                  │                  │                  │
+╰──────────────────┴──────────────────┴──────────────────╯
+   aynı soru · aynı depo · üçer koşunun ortalaması
+```
 
 ```bash
 npm install -g doguxclaude
@@ -60,38 +73,52 @@ dxc
 
 ## Neden
 
-Claude Code'a bir depoyu sorduğunda aramaya çıkar. Gerçek oturumlarda ölçüldü.
+Claude Code'a bir depoyu sorduğunda önce onu **aramaya** çıkar. Nerede olduğunu
+bilmez, içinde ne olduğunu bilmez, hangi dosyanın var olduğunu bilmez.
+
+Aynı soru, aynı depo, üçer kez ölçüldü.
 
 ```
-╭─ dxc olmadan ──────────────────────────────────╮
-│ › api-platform nedir, tek cümle                │
-│                                                │
-│   ⎿ ls                                         │
-│   ⎿ find . -type f | head -80                  │
-│   ⎿ cat README.md        ✗ böyle bir dosya yok │
-│   ⎿ cat CLAUDE.md                              │
-│                                                │
-│   3 araç çağrısı · 10.494 bayt · 20 sn         │
-╰────────────────────────────────────────────────╯
+╭─ dxc olmadan ────────────────────────────────────╮
+│ › api-platform nedir, tek cümle                  │
+│                                                  │
+│   ⎿ ls -d ~/*api-platform*     depoyu arıyor     │
+│   ⎿ ls api-platform/           yapıyı arıyor     │
+│   ⎿ cat README.md              ✗ böyle dosya yok │
+│                                                  │
+│   83.906 token · 15,8 sn · 4,3 tur               │
+╰──────────────────────────────────────────────────╯
 ```
 
 Ajan, olmayan bir `README.md`'yi tahmin etti ve hata aldı. O depoda `CLAUDE.md`
 var. Bilmesinin bir yolu yoktu.
 
 ```
-╭─ dxc ile ──────────────────────────────────────╮
-│ › api-platform nedir, tek cümle                │
-│                                                │
-│   yapı zaten elinde. 1.120 dosya, kök dosyalar │
-│   ada ada yazılı, CLAUDE.md orada görünüyor.   │
-│                                                │
-│   ⎿ cat CLAUDE.md                              │
-│                                                │
-│   1 araç çağrısı · 647 token · tahmin yok      │
-╰────────────────────────────────────────────────╯
+╭─ dxc ile ───────────────────────────────────────────╮
+│ › api-platform nedir, tek cümle                     │
+│                                                     │
+│   harita ve yapı zaten elinde, arama yok            │
+│   ⎿ cat CLAUDE.md              doğrudan doğru dosya │
+│                                                     │
+│   48.915 token · 10,6 sn · 2,7 tur                  │
+╰─────────────────────────────────────────────────────╯
 ```
 
 Yapı bloğu kök dosyaları **ada ada** yazar. Artık tahmin etmiyor.
+
+Bir de beklemediğim bir sonuç çıktı. Üç koşuda **oynaklık** da düştü:
+
+```
+ dxc olmadan   74.551 ─── 81.894 ─────────── 95.273     %25 fark
+ dxc ile       48.326 ─ 49.179 ─ 49.240                  %2 fark
+```
+
+Ajan aramaya çıkınca her seferinde başka yol deniyor ve maliyet tahmin edilemez
+oluyor. Yapı elinde olunca aynı işi hep aynı şekilde yapıyor.
+
+<sub>Ölçüm: aynı soru (`api-platform nedir, tek cümle`), aynı depo (1.120 dosya),
+her yapılandırma için üç koşu, bu makine. Token sayısı girdi, çıktı ve önbellek
+dahil toplam işlenen jetondur; `claude -p --output-format json` çıktısından alındı.</sub>
 
 ---
 
@@ -179,6 +206,10 @@ Kurallar ve ölçümler: [`NE-YAPIYOR.md`](NE-YAPIYOR.md) · Tasarım: [`TASLAK.
 a **map** of every git repo (one line each), the **structure** of the repo you
 ask about (injected the moment you name it, extracted from code in 10 ms), and
 a **memory** of your last 30 sessions (one sentence each, written on exit).
+
+**Measured on the same question, three runs each: 42% fewer tokens, 33% faster,
+38% fewer turns** (83,906 → 48,915 tokens; 15.8 → 10.6 s; 4.3 → 2.7 turns).
+Variance collapsed too, from 25% to 2%: the agent stops improvising a search.
 
 Structure is a reading, not a judgement, so code does it. Only the one-line
 description is a judgement, so the model does it once per repo. Scanning 11 repos
