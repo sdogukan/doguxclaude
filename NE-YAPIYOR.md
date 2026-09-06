@@ -57,10 +57,21 @@ Model çalışmaz, hiçbir yerde saklanmaz, o anda üretilir.
 ### Ne zaman verilir
 
 - **`dxc` yazdığın anda**, bulunduğun klasörün deposu için. Sistem istemine girer.
-- **Oturum içinde başka bir depoya girdiğinde**, o depo için. `UserPromptSubmit`
-  kancası ile gelir.
+- **Bir deponun adını her andığında**, o depo için. `UserPromptSubmit` kancası ile gelir.
+- **İçinde bulunduğun depo için**, adını anmasan da.
 
-Aynı depoda kaldığın sürece hiçbir şey verilmez. Maliyet yalnız geçişte ödenir.
+**Bir depo oturum başına en fazla bir kez yazılır.** On bir deponun hepsi girse
+toplam yaklaşık 4.000 token; pratikte bir iki depo girer.
+
+Kuralın "adı geçen depo" olmasının sebebi ölçümdür. Önce "bulunduğun depo" diye
+yazılmıştı ve işe yaramadı: sen bir depoyu sorduğunda model henüz orada değildir,
+oraya cevap verirken girer. Yapı hep bir istem geç geliyordu ve o istemde artık
+gereksizdi. Canlı oturumda cozdukce yapısı dijji-ai sorulurken, dijji-ai yapısı
+oturum kimliği sorulurken geldi; ikisi de boşa gitti.
+
+Ad eşleşmesi Türkçe harfe duyarsızdır: sen "çözdükçe" yazarsın, klasör
+"cozdukce"dir, ikisi eşleşir. Üç harften kısa adlar eşleşmez ki her cümleye
+takılmasın.
 
 Kanca `claude --settings` ile geçici olarak tanıtılır. Senin
 `~/.claude/settings.json` dosyana **hiçbir şey yazılmaz**; ölçüldü, yalnız kanca
@@ -113,4 +124,4 @@ Kırk kat dosya, dört kat satır.
 |---|---|---|
 | `~/.doguxclaude/index.md` | harita | evet |
 | `~/.doguxclaude/durum.json` | şekil parmak izleri | hayır |
-| `~/.doguxclaude/oturum/` | oturum başına son enjekte edilen depo | hayır |
+| `~/.doguxclaude/oturum/` | oturum başına yazılmış depoların listesi | hayır |
