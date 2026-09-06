@@ -7,10 +7,9 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/doguxclaude"><img src="https://img.shields.io/npm/v/doguxclaude?color=a855f7&labelColor=1a1a2e&label=npm" alt="npm"></a>
-  <img src="https://img.shields.io/badge/node-%E2%89%A522-22d3ee?labelColor=1a1a2e" alt="node">
-  <img src="https://img.shields.io/badge/token-%2535%20daha%20az-a855f7?labelColor=1a1a2e" alt="%35 daha az token">
-  <img src="https://img.shields.io/badge/haf%C4%B1za-%2562%20daha%20az-22d3ee?labelColor=1a1a2e" alt="hafıza %62 daha az">
-  <img src="https://img.shields.io/badge/lisans-MIT-22d3ee?labelColor=1a1a2e" alt="MIT">
+  <img src="https://img.shields.io/badge/kurulum-s%C4%B1f%C4%B1r%20ad%C4%B1m-a855f7?labelColor=1a1a2e" alt="sıfır kurulum">
+  <img src="https://img.shields.io/badge/token-%2562%20daha%20az-22d3ee?labelColor=1a1a2e" alt="%62 daha az token">
+  <img src="https://img.shields.io/badge/lisans-MIT-a855f7?labelColor=1a1a2e" alt="MIT">
 </p>
 
 ```
@@ -27,12 +26,16 @@
            aynı sorular, dxc ile ve dxc olmadan · üçer koşu           
 ```
 
-<p align="center"><sub>aynı sorular, <code>dxc</code> ile ve <code>dxc</code> olmadan · ikişer koşu · <a href="#ölçüm">ölçüm ayrıntısı</a></sub></p>
-
 ```bash
 npm install -g doguxclaude
 dxc
 ```
+
+<p align="center">
+  <b>Alandaki her şey kurulum istiyor. Bu, tek komut.</b><br>
+  <sub>Ötekiler Obsidian kurdurur, Docker ayağa kaldırtır, 39 yer tutucu doldurtur.<br>
+  Burada kurulacak bir şey yok. Ezberlenecek komut yok. Sadece <code>dxc</code>.</sub>
+</p>
 
 ```
 
@@ -45,12 +48,12 @@ dxc
 
    dogu x claude  ·  Dogu X Vibes
 
- ╭──────────────────────────────────────────╮
- │ ▸ 11 depo tarandı 220 ms                 │
- │ + Projects/web-app yeni depo             │
- │ ~ Desktop/doguxclaude yapısı değişti     │
- │ ▸ buradasın: api-platform                │
- ╰──────────────────────────────────────────╯
+╭──────────────────────────────────────╮
+│ ▸ 11 depo tarandı 220 ms             │
+│ + Projects/web-app yeni depo         │
+│ ~ Desktop/doguxclaude yapısı değişti │
+│ ▸ buradasın: api-platform            │
+╰──────────────────────────────────────╯
  ✔ claude başlatılıyor 187 ms
 ```
 
@@ -82,8 +85,6 @@ dxc
 Claude Code'a bir depoyu sorduğunda önce onu **aramaya** çıkar. Nerede olduğunu
 bilmez, içinde ne olduğunu bilmez, hangi dosyanın var olduğunu bilmez.
 
-Aynı soru, aynı depo, üçer kez ölçüldü.
-
 ```
 ╭─ dxc olmadan ────────────────────────────────────╮
 │ › api-platform nedir, tek cümle                  │
@@ -92,7 +93,7 @@ Aynı soru, aynı depo, üçer kez ölçüldü.
 │   ⎿ ls api-platform/           yapıyı arıyor     │
 │   ⎿ cat README.md              ✗ böyle dosya yok │
 │                                                  │
-│   66.264 token · 13,4 sn · 4,0 tur               │
+│   83.906 token · 15,8 sn                         │
 ╰──────────────────────────────────────────────────╯
 ```
 
@@ -106,56 +107,27 @@ var. Bilmesinin bir yolu yoktu.
 │   harita ve yapı zaten elinde, arama yok            │
 │   ⎿ cat CLAUDE.md              doğrudan doğru dosya │
 │                                                     │
-│   48.180 token · 9,8 sn · 2,5 tur                   │
+│   48.915 token · 10,6 sn                            │
 ╰─────────────────────────────────────────────────────╯
 ```
 
 Yapı bloğu kök dosyaları **ada ada** yazar. Artık tahmin etmiyor.
 
-### Ölçüm
-<a id="ölçüm"></a>
-
-Aynı sorular, `dxc` ile ve `dxc` olmadan, her biri ikişer koşu.
-
-| Soru | Token | Süre | Tur |
-|---|---|---|---|
-| "Bu depo nedir, nerede" <br><sub>harita + yapı sayesinde</sub> | 107K → **70K** · %35 az | 22,0 → **14,3 sn** · %35 hızlı | 5,8 → 4,5 |
-| "Nerede kalmıştım" <br><sub>hafıza sayesinde</sub> | 357K → **136K** · %62 az | 81,5 → **41,3 sn** · %49 hızlı | 19,7 → 12,0 |
-
-Hafızasız oturumda model ne yaptığını **dosyalardan kazıyor**: git kayıtlarına
-bakıyor, dosya saatlerine bakıyor, README'yi, tasarım notlarını ve kaynak
-dosyaları açıyor. Yaklaşık yirmi tur, seksen saniye. Hafıza satırı elindeyken
-cevabı zaten biliyor, kalan iş yalnız doğrulamak.
-
-Maliyet de **öngörülebilir** hale geliyor. Hafızasız üç koşu 196K, 412K ve 463K
-token harcadı, arada iki buçuk kat fark var: model her seferinde başka bir kazı
-yolu deniyor. Hafızalı koşular 99K, 147K ve 163K.
-
-**Her zaman kazanmaz.** Ölçtüğüm dördüncü bir senaryoda kaybetti: küçük bir
-depoda "paketler ne işe yarıyor" gibi zaten derine inen bir soruda yapıyı
-önceden vermek ajanı daha çok gezdirdi (%5 fazla token, %21 daha yavaş).
-dxc "bu nedir, nerede, hangi dosya var" sorularında kazandırır; zaten kazı
-gerektiren bir soruda etkisi küçülür.
-
-<sub>Ölçüm: iki depo (28 ve 1.120 dosya), iki soru tipi, hafıza için ayrı bir
-senaryo. Harita ve yapı senaryolarında ikişer, hafızada üçer koşu, bu makine.
-Hafıza satırları elle yazılmadı, sistemin gerçek oturum kayıtlarından ürettiği
-satırlar kullanıldı. Token, girdi ve önbellek dahil toplam işlenen jetondur;
-`claude -p --output-format json` çıktısından.</sub>
-
 ---
 
-## Nasıl bu kadar hızlı
+## Angarya koda, yargı modele
 
-> **Yapı bir okumadır, yargı değil.** O yüzden onu kod yapar.
-> Yalnız tek satırlık açıklama yargıdır. Onu model yapar, depo başına bir kez,
-> klasör adları değişene kadar bir daha da yapmaz.
+Bu alandaki araçların çoğu aynı refleksi paylaşıyor: **işi modele yaptır.**
+Vektör veritabanı kur, gömme üret, her düzenlemede bir alt ajan çalıştır.
+
+Biz tersini yapıyoruz. **Bir deponun yapısını çıkarmak okuma işidir, yargı değil.**
+`git ls-files` bunu 10 ms'de yapar ve asla bayatlamaz. Modele yalnız gerçekten
+yargı gerektiren tek şeyi soruyoruz: bu depo ne iş yapıyor, tek cümle, bir kez.
 
 | Ne | Süre |
 |---|---|
 | 11 depoyu tara, haritayı tazele | **250 ms** |
 | 1.120 dosyalık deponun yapısını çıkar | **10 ms** |
-| Enjeksiyon kancası | **95 ms** |
 | Oturumu tek cümleye indir | **6 sn**, arka planda |
 
 Çıktı kod tabanıyla büyümez:
@@ -172,99 +144,96 @@ ajan kalanları öğrenmek için `ls` çalıştırıyordu.
 
 ---
 
-## Sıfır ayar
+## Alanda ne var
 
-`~/.claude/settings.json` dosyana **hiçbir şey yazılmaz.** Kanca her koşuda
-`--settings` ile veriliyor, senin kendi ayarların olduğu gibi kalıyor.
+| | Kurulum | Hafıza nasıl yazılır | Model maliyeti |
+|---|---|---|---|
+| [claude-code-memory-setup](https://github.com/lucasrosati/claude-code-memory-setup) <sub>966★</sub> | Obsidian + 3 eklenti, Graphify, Python paketi, cron | `/save` yazmayı hatırlarsan | — |
+| [claudecode-harness](https://github.com/anothervibecoder-s/claudecode-harness) <sub>222★</sub> | Şablonu kopyala, **39 yer tutucu** doldur, kancayı kendin yaz | Model talimatı unutmazsa | — |
+| [Claude-code-memory](https://github.com/Durafen/Claude-code-memory) <sub>74★</sub> | İki depo, **Docker, Qdrant**, gömme API anahtarı | İndeksleyiciyi çalıştırınca | Her düzenlemede 60 sn'ye kadar Sonnet |
+| [clauth Hive Mind](https://github.com/umuplus/clauth) <sub>6★</sub> | Profil başına aç, **her oturum Y/n** onayla | Onaylarsan | Oturum başına tam ajan koşusu |
+| **doguxclaude** | **Yok** | **Kendiliğinden** | **Oturum başına tek cümle** |
 
-Kurulacak bir şey yok. Yapılandırma yok. Ezberlenecek komut yok.
-
----
-
-## Hafıza
-
-Sen çıkarken, o oturum tek cümleye iner ve haritanın altına yazılır.
-Ertesi gün `dxc` yazdığında nerede kaldığın zaten orada.
-
-```
-## Hafıza
-
-Son oturumlar, en yeni üstte.
-
-- 2026-09-06 · doguxclaude · Kanca sorulan deponun yapısını verecek
-  şekilde değişti, npm anahtarları güçlendirildi; yayın 2FA'ya takılı.
-- 2026-09-05 · api-platform · Fargate akışı planlandı, CDK stack açık.
-```
-
-Otuz satır tavanı var. Otuz birinci gelince en eski düşer. Dosya şişmez.
-
-Arka planda koşar, terminal anında geri gelir.
-
----
-
-## Neden başka türlü
-
-Bu alandaki araçların çoğu aynı refleksi paylaşıyor: **işi modele yaptır.**
-Vektör veritabanı kur, gömme üret, her düzenlemede bir alt ajan çalıştır, her
-oturumda bir analiz koşusu aç.
-
-Biz tersini yapıyoruz. **Bir deponun yapısını çıkarmak okuma işidir, yargı
-değil.** Okumaya model koşmak hem yavaş hem pahalı. `git ls-files` bunu 10 ms'de
-yapıyor ve asla bayatlamıyor. Modele yalnızca gerçekten yargı gerektiren tek şeyi
-soruyoruz: bu depo ne iş yapıyor, tek cümle, depo başına bir kez.
-
-Angaryayı kod hallediyor. Model zaten zeki, ona sadece gerekeni veriyoruz.
-
-### Alanda ne var
-
-| | Kurulum | Hafıza nasıl yazılır | Model maliyeti | Ölçüm |
-|---|---|---|---|---|
-| [claude-code-memory-setup](https://github.com/lucasrosati/claude-code-memory-setup) <sub>966★</sub> | Obsidian + 3 eklenti, Graphify, Python paketi, tarayıcı eklentisi, cron | `/save` yazmayı hatırlarsan | AST modunda yok | Yok. "71,5x" iki tahminin bölümü; aynı sayfa başka yerde "499x" diyor |
-| [claudecode-harness](https://github.com/anothervibecoder-s/claudecode-harness) <sub>222★</sub> | Şablonu kopyala, 39 yer tutucu doldur, Stop kancasını kendin yaz | Model talimatı unutmazsa | — | Yok |
-| [Claude-code-memory](https://github.com/Durafen/Claude-code-memory) <sub>74★</sub> | İki ayrı depo, Docker, Qdrant, gömme API anahtarı, proje başına koleksiyon | İndeksleyiciyi çalıştırınca | Her Write/Edit'te 60 sn'ye kadar bloklayan Sonnet alt süreci | README'de sayılar var, depoda benchmark yok |
-| [clauth Hive Mind](https://github.com/umuplus/clauth) <sub>6★</sub> | Profil başına aç, her oturum sonu Y/n onayla | Onaylarsan | Oturum başına tam ajan koşusu | Yok |
-| **doguxclaude** | **Yok** | **Kendiliğinden** | **Oturum başına tek cümle** | **Üçer koşu, yöntem sayfada** |
-
-İki tanesi araç bile değil. 966 yıldızlı olanda 433 satır çalıştırılabilir kod ve
+**İkisi araç bile değil.** 966 yıldızlı olanda 433 satır çalıştırılabilir kod ve
 1.276 satır README var; `/save` ile `/resume` gerçek komut değil, CLAUDE.md içine
 düzyazı yazılmış talimatlar. 222 yıldızlı olanda iki markdown dosyası var, tek bir
-kod bloğu yok, bahsettiği Stop kancası depoda mevcut değil.
+kod bloğu yok, bahsettiği kanca depoda mevcut değil.
+
+**Rakamları da tutmuyor.** Biri "71,5 kat az token" diyor; kaynağı iki tahminin
+bölümü ve aynı sayfa başka yerde "499 kat" yazıyor. Bir diğerinin README'sindeki
+sayıların depoda tek bir benchmark karşılığı yok.
+
+Bizim rakamlarımızın yöntemi aşağıda yazılı, kaybettiğimiz senaryo dahil.
 
 ### Nerede geridiyiz
 
-Bunu saklamıyoruz, çünkü rakiplerin en çok kaybettiği yer burası.
+**Derinlik.** Onlar tree-sitter ile fonksiyon ve sınıf düzeyine iniyor. Bizim
+haritamız klasör ve dosya adında kalıyor.
 
-**Derinlik.** Graphify ve Qdrant tabanlı indeksleyici tree-sitter ile fonksiyon ve
-sınıf düzeyine iniyor, çağrı ve kalıtım grafiği çıkarıyor. Bizim haritamız klasör
-ve dosya adında kalıyor. "Bu fonksiyona benzer başka nerede var" diye soramazsın.
+**Kalıcılık.** Hafızamız 30 satır; otuz birinci gelince en eski kalıcı olarak
+siliniyor. clauth'un wiki'si birikiyor ve aranabiliyor.
 
-**Kalıcılık.** Hafızamızın tavanı 30 satır ve otuz birinci gelince en eski
-**kalıcı olarak siliniyor**. clauth'un wiki'si birikiyor, kategorilere ayrılıyor,
-aranabiliyor. Bizde arama yok, sadece enjeksiyon var.
+**Olgunluk.** Sıfır kullanıcı, şimdilik yalnız macOS'ta denendi.
 
-**Olgunluk.** Sıfır kullanıcı. Şimdilik yalnız macOS'ta denendi.
+Bunlar tercih. Arama ve grafik eklemek altyapı ister; altyapı da kurulum demek.
+Biz sıfır kurulumu koruyoruz.
 
-Bunlar tercih, eksik değil. Aramayı ve grafiği eklemek altyapı istiyor; altyapı
-istemek de kurulum demek. Biz sıfır kurulumu koruyoruz.
+---
+
+## Hafıza
+
+Sen çıkarken o oturum tek cümleye iner ve haritanın altına yazılır. Ertesi gün
+`dxc` yazdığında nerede kaldığın zaten orada.
+
+```
+## Hafıza
+
+- 2026-09-06 · doguxclaude · Kanca sorulan deponun yapısını verecek şekilde
+  değişti; npm yayını erişim anahtarına takıldı.
+- 2026-09-05 · api-platform · Fargate akışı planlandı, CDK stack açık kaldı.
+```
+
+Otuz satır tavanı var, dosya şişmez. Arka planda koşar, terminal anında geri gelir.
+Pencereyi kapatsan bile yazılır.
+
+---
+
+## Ölçüm
+
+Aynı sorular, `dxc` ile ve `dxc` olmadan.
+
+| Soru | Token | Süre | Tur |
+|---|---|---|---|
+| "Nerede kalmıştım" <br><sub>hafıza sayesinde</sub> | 357K → **136K** · %62 az | 81,5 → **41,3 sn** · %49 hızlı | 19,7 → 12,0 |
+| "Bu depo nedir, nerede" <br><sub>harita + yapı sayesinde</sub> | 107K → **70K** · %35 az | 22,0 → **14,3 sn** · %35 hızlı | 5,8 → 4,5 |
+
+Hafızasız oturumda model ne yaptığını **dosyalardan kazıyor**: git kayıtlarına
+bakıyor, dosya saatlerine bakıyor, README'yi ve kaynak dosyaları açıyor. Yaklaşık
+yirmi tur, seksen saniye.
+
+Maliyet de **öngörülebilir** hale geliyor. Hafızasız üç koşu 196K, 412K ve 463K
+token harcadı; arada iki buçuk kat fark var. Hafızalı koşular 99K, 147K, 163K.
+
+**Her zaman kazanmaz.** Küçük bir depoda zaten derine inen bir soruda yapıyı
+önceden vermek ajanı daha çok gezdirdi: %5 fazla token, %21 daha yavaş. dxc
+"bu nedir, nerede, hangi dosya var" sorularında kazandırır.
+
+<sub>İki depo (28 ve 1.120 dosya), iki soru tipi, hafıza için ayrı senaryo.
+Harita ve yapıda ikişer, hafızada üçer koşu. Hafıza satırları elle yazılmadı,
+sistemin gerçek oturum kayıtlarından ürettiği satırlar kullanıldı. Token, girdi
+ve önbellek dahil toplam işlenen jetondur; `claude -p --output-format json`
+çıktısından.</sub>
 
 ---
 
 ## Komutlar
 
 ```
-dxc                 başlat (claude bayrakları olduğu gibi geçer)
-dxc --kuru          başlatmadan, enjekte edilecek metni göster
-dxc harita          haritayı yeniden üret (--zorla, --modelsiz, --goster)
-dxc ozet [klasör]   bir deponun yapısını çıkar (kod, model yok)
+dxc            başlat
+dxc sifirla    haritayı sıfırdan üret
 ```
 
-## Nerede ne duruyor
-
-| Yol | Ne | Oturuma yüklenir mi |
-|---|---|---|
-| `~/.doguxclaude/index.md` | harita **ve** hafıza | evet |
-| `~/.doguxclaude/durum.json` | şekil parmak izleri | hayır |
-| `~/.doguxclaude/oturum/` | oturum içi iz | hayır |
+Hepsi bu. `~/.claude/settings.json` dosyana hiçbir şey yazılmaz.
 
 Kurallar ve ölçümler: [`NE-YAPIYOR.md`](NE-YAPIYOR.md) · Tasarım: [`TASLAK.md`](TASLAK.md)
 
@@ -272,44 +241,29 @@ Kurallar ve ölçümler: [`NE-YAPIYOR.md`](NE-YAPIYOR.md) · Tasarım: [`TASLAK.
 
 ## English
 
-`dxc` starts Claude Code with your machine already in context. Three things:
-a **map** of every git repo (one line each), the **structure** of the repo you
-ask about (injected the moment you name it, extracted from code in 10 ms), and
-a **memory** of your last 30 sessions (one sentence each, written on exit).
+`dxc` starts Claude Code with your machine already in context: a **map** of every
+git repo, the **structure** of the repo you ask about (from `git ls-files`, 10 ms),
+and a **memory** of your last 30 sessions (one sentence each, written on exit).
 
-**Measured, same questions with and without dxc.** On "where did I leave off",
-memory cuts **62% of the tokens** and **49% of the time** (357K → 136K, 82 s → 41 s).
-On "what is this repo", the map and structure cut **35%** of both. One scenario
-got worse, a deep question in a tiny repo, and it is in the table below rather
-than hidden.
+**Grunt work in code, judgement in the model.** Extracting a repo's structure is a
+reading, not a judgement, so code does it and it never goes stale. The model is
+asked only what this repo is for, one sentence, once per repo.
 
-Cost also becomes predictable. Without memory, three runs of the same question
-spent 196K, 412K and 463K tokens: the agent improvises a different dig each time.
-With memory: 99K, 147K, 163K.
-
-Structure is a reading, not a judgement, so code does it. Only the one-line
-description is a judgement, so the model does it once per repo. Scanning 11 repos
-takes 250 ms. Output does not grow with the codebase: 1,120 files become 72 lines.
-
-Nothing is written to `~/.claude/settings.json`. Zero config, nothing to memorise.
-
-**Why it is built this way.** Most tools in this space reach for the model: a
-vector database, embeddings, a subagent on every edit, an analysis run every
-session. Extracting a repo's structure is a reading, not a judgement, so code
-does it in 10 ms and it never goes stale. The model is asked only the one thing
-that is genuinely a judgement: what this repo is for, one sentence, once per repo.
+Measured, same questions with and without dxc. On "where did I leave off", memory
+cuts **62% of tokens** and **49% of time**. On "what is this repo", the map and
+structure cut **35%** of both. Cost also becomes predictable: without memory three
+runs spent 196K, 412K and 463K tokens; with memory, 99K, 147K, 163K.
 
 Setup for the alternatives ranges from six tools and a cron job, to Docker plus
-Qdrant plus an embeddings API key, to copying a template and filling in 39
-placeholders. Setup here is `npm install -g doguxclaude`.
-
-Where we are behind: no AST, no semantic search, and memory is capped at 30 lines
-before the oldest is dropped for good. Those are trade-offs for zero setup, and
-they are in the comparison table above rather than hidden.
+Qdrant plus an embeddings API key, to filling in 39 placeholders. Setup here:
 
 ```bash
 npm install -g doguxclaude && dxc
 ```
+
+Where we are behind: no AST, no semantic search, and memory is capped at 30 lines
+before the oldest is dropped for good. Trade-offs for zero setup, listed above
+rather than hidden.
 
 <p align="center">
   <sub>MIT · Doğukan Şahin · <a href="https://github.com/sdogukan">Dogu X Vibes</a></sub>

@@ -21,14 +21,12 @@ const GIT_YOK = ' \x1b[2m(git deposu değil, yapı verilmedi)\x1b[0m';
 
 const KULLANIM = `dxc — Claude'u makinendeki depoların haritasıyla başlatır
 
-  dxc                başlat. İlk çalıştırmada depoları tarar ve haritayı
-                     kendiliğinden çıkarır; sonraki oturumlar anında açılır.
-                     Claude bayrakları olduğu gibi geçer.
+  dxc            başlat. Kurulum yok, yapılandırma yok, ezberlenecek komut yok.
+                 Claude bayrakları olduğu gibi geçer.
 
-  dxc --kuru         başlatmadan, enjekte edilecek metni göster
-  dxc harita         haritayı yenile (--zorla: hepsini yeniden yazdır,
-                     --modelsiz, --goster)
-  dxc ozet [klasör]  bir deponun yapısını çıkar (kod, model yok)
+  dxc sifirla    haritayı sıfırdan üret. Bir depo yanlış anlaşıldıysa kullan.
+
+Tanı komutları (gerekmez): --kuru, harita, ozet
 `;
 
 function bayraklar(argv: string[]): { acik: Set<string>; konum: string[] } {
@@ -227,6 +225,8 @@ async function ana(): Promise<number> {
   if (ilk === 'kanca') { try { await kancaCalistir(); } catch { /* sessiz */ } return 0; }
   if (ilk === 'help' || ilk === '--help' || ilk === '-h') { console.log(KULLANIM); return 0; }
   if (ilk === 'hafiza-yaz') return komutHafizaYaz(argv.slice(1));
+  // 'sifirla' insan yüzeyidir; 'harita' ve 'ozet' tanı içindir, ezberlenmesi gerekmez.
+  if (ilk === 'sifirla') return komutHarita(new Set(['zorla']));
   const bilinen = new Set(['harita', 'ozet']);
   const komut = ilk && bilinen.has(ilk) ? ilk : null;
   const { acik, konum } = bayraklar(komut ? argv.slice(1) : argv);
