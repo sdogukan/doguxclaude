@@ -16,11 +16,7 @@ const ATLA = new Set(['node_modules', 'Library', 'venv', '__pycache__', 'dist', 
 export interface Depo {
   yol: string;        // mutlak
   goreli: string;     // ev dizinine göre
-  remote: string;
-  dal: string;
-  commit: number;
   sonDegisiklik: string;
-  kirli: boolean;
 }
 
 export function depolariBul(baslangic = homedir(), maxDerinlik = 5): string[] {
@@ -40,15 +36,13 @@ export function depolariBul(baslangic = homedir(), maxDerinlik = 5): string[] {
   return bulunan;
 }
 
+/** Yalnız haritada kullanılan alanlar okunur. `git status` ve `rev-list --count`
+ *  büyük depoda yüzlerce ms sürüyordu ve çıktıda hiç görünmüyordu; kaldırıldı. */
 export function depoBilgisi(yol: string, ev = homedir()): Depo {
   return {
     yol,
     goreli: relative(ev, yol) || yol,
-    remote: git(yol, 'remote', 'get-url', 'origin'),
-    dal: git(yol, 'rev-parse', '--abbrev-ref', 'HEAD'),
-    commit: Number(git(yol, 'rev-list', '--count', 'HEAD')) || 0,
     sonDegisiklik: git(yol, 'log', '-1', '--format=%cs'),
-    kirli: git(yol, 'status', '--porcelain').length > 0,
   };
 }
 

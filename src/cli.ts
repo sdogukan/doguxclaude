@@ -5,7 +5,8 @@
 import { spawn } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { basename, join, resolve } from 'node:path';
-import { haritaOku, haritaUret } from './harita.js';
+import { haritaOku, haritaTazele } from './harita.js';
+import { baslik, satir, son, sure, tik, vurgu } from './ekran.js';
 import { depoOzeti } from './ozet.js';
 import { iceridekiDepo } from './tarama.js';
 import { hata, HARITA_YOLU, yaz } from './util.js';
@@ -17,7 +18,8 @@ const KULLANIM = `dxc — Claude'u makinendeki depoların haritasıyla başlatı
                      Claude bayrakları olduğu gibi geçer.
 
   dxc --kuru         başlatmadan, enjekte edilecek metni göster
-  dxc harita         haritayı yenile (--modelsiz, --goster)
+  dxc harita         haritayı yenile (--zorla: hepsini yeniden yazdır,
+                     --modelsiz, --goster)
   dxc ozet [klasör]  bir deponun yapısını çıkar (kod, model yok)
 `;
 
@@ -40,14 +42,12 @@ function komutOzet(konum: string[]): number {
 function komutHarita(acik: Set<string>): number {
   if (acik.has('goster')) {
     const h = haritaOku();
-    if (!h) { console.error(hata('harita', 'harita yok', 'dxc harita ile üret')); return 1; }
+    if (!h) { console.error(hata('harita', 'harita yok', 'dxc ile üret')); return 1; }
     console.log(h); return 0;
   }
-  process.stderr.write('depolar taranıyor…\n');
-  const s = haritaUret({ modelsiz: acik.has('modelsiz') });
-  process.stderr.write(`${s.depolar.length} depo · kod ${s.kodMs} ms` +
-    (s.modelCalisti ? ` · model ${(s.modelMs / 1000).toFixed(0)} sn` : ' · model çalışmadı') +
-    `\nyazıldı: ${HARITA_YOLU}\n`);
+  baslik();
+  const s = haritaTazele({ zorla: acik.has('zorla'), modelsiz: acik.has('modelsiz') });
+  son(s.degisti ? `${tik()} harita güncellendi ${vurgu(HARITA_YOLU)}` : `${tik()} harita zaten güncel`);
   return 0;
 }
 
@@ -60,15 +60,11 @@ const YONERGE = [
   'Deponun kendi CLAUDE.md dosyası varsa geçerliliğini korur: bu özet onun yerine geçmez, yalnız yapıyı tekrar keşfetme yükünü kaldırır.',
 ].join('\n');
 
-/** İlk çalıştırma: harita yoksa kendiliğinden üretilir. Kullanıcı hiçbir şey kurmaz,
- *  hiçbir komut ezberlemez; terminale `dxc` yazar ve sistem çalışır. */
+/** Her açılışta depolar taranır (9 ms, bedava) ve harita gerekiyorsa tazelenir.
+ *  Yeni depo eklendiyse yalnız onun açıklaması yazdırılır; var olanlara dokunulmaz.
+ *  Kullanıcı hiçbir şey kurmaz, hiçbir komut ezberlemez: terminale `dxc` yazar. */
 function haritaSagla(): string {
-  const mevcut = haritaOku();
-  if (mevcut) return mevcut.trim();
-  process.stderr.write('dxc: ilk çalıştırma — depolar taranıyor ve harita çıkarılıyor (bir kez, ~40 sn)…\n');
-  const s = haritaUret();
-  process.stderr.write(`dxc: ${s.depolar.length} depo · kod ${s.kodMs} ms` +
-    (s.modelCalisti ? ` · açıklamalar ${(s.modelMs / 1000).toFixed(0)} sn` : ' · açıklama üretilemedi') + '\n');
+  haritaTazele();
   return (haritaOku() ?? '').trim();
 }
 
@@ -90,7 +86,12 @@ function baglam(): string {
 }
 
 async function baslat(argv: string[], acik: Set<string>): Promise<number> {
+  const t0 = Date.now();
+  baslik();
   const metin = baglam();
+  const depo = iceridekiDepo(process.cwd());
+  satir(depo ? `${vurgu(basename(depo))} ${sure(Date.now() - t0)}` : `git deposu değil ${sure(Date.now() - t0)}`);
+  son(acik.has('kuru') ? `${tik()} kuru koşu` : `${tik()} claude başlatılıyor`);
   if (acik.has('kuru')) { console.log(metin); return 0; }
   const yol = join(tmpdir(), `dxc-${process.pid}.md`);
   yaz(yol, metin);
