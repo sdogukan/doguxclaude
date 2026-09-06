@@ -11,6 +11,7 @@ import { homedir } from 'node:os';
 import { calisiyor, satir, son, sure, tik, vurgu } from './ekran.js';
 import { depoOzeti } from './ozet.js';
 import { Depo, depoBilgisi, depolariBul } from './tarama.js';
+import { durumOku, durumYaz, sekilIzi } from './durum.js';
 import { bugun, HARITA_YOLU, oku, yaz } from './util.js';
 
 export interface HaritaSatiri { goreli: string; aciklama: string; dosya: number; sonDegisiklik: string }
@@ -69,14 +70,25 @@ export function haritaTazele(secenek: { zorla?: boolean; modelsiz?: boolean; ses
   const kodMs = Date.now() - t0;
 
   const eski = mevcutAciklamalar();
+  const durum = durumOku();
   const suAnki = new Set(depolar.map((d) => d.goreli));
-  const yeni = secenek.zorla ? depolar.map((d) => d.goreli) : depolar.filter((d) => !eski.has(d.goreli)).map((d) => d.goreli);
+
+  // Açıklama neye dayanır: klasör ADLARINA. Ad ağacı değişmediyse açıklama hâlâ
+  // geçerlidir; dosya sayısının değişmesi deponun ne iş yaptığını değiştirmez.
+  const izler = new Map(depolar.map((d) => [d.goreli, sekilIzi(ozetler.get(d.goreli)!.metin)]));
+  const yeniDepo = depolar.filter((d) => !eski.has(d.goreli)).map((d) => d.goreli);
+  const sekliDegisen = depolar
+    .filter((d) => eski.has(d.goreli) && durum.depolar[d.goreli]?.sekil !== izler.get(d.goreli))
+    .map((d) => d.goreli);
+  const yeni = secenek.zorla ? depolar.map((d) => d.goreli) : [...yeniDepo, ...sekliDegisen];
   const dusen = [...eski.keys()].filter((k) => !suAnki.has(k));
-  const degisti = yeni.length > 0 || dusen.length > 0 || !oku(HARITA_YOLU);
+  // Sayı ve tarih bedava hesaplanıyor; harita her açılışta yazılır ki bayatlamasın.
+  const degisti = true;
 
   if (!secenek.sessiz) {
     satir(`${depolar.length} depo ${sure(kodMs)}`);
     for (const d of dusen) satir(`${vurgu(d)} artık yok, haritadan düştü`);
+    for (const d of sekliDegisen) satir(`${vurgu(d)} yapısı değişti, açıklama yenilenecek`);
   }
 
   let modelMs = 0;
@@ -103,6 +115,8 @@ export function haritaTazele(secenek: { zorla?: boolean; modelsiz?: boolean; ses
     }));
     yaz(HARITA_YOLU, haritaMetni(satirlar));
   }
+  // Parmak izleri ayrı dosyada: index.md her oturuma yükleniyor, makine verisi oraya girmez.
+  durumYaz({ surum: 1, depolar: Object.fromEntries(depolar.map((d) => [d.goreli, { sekil: izler.get(d.goreli)! }])) });
   return { depolar, yeni, dusen, degisti, kodMs, modelMs };
 }
 

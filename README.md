@@ -32,6 +32,26 @@ Oturum başlarken iki şey enjekte edilir:
 
 Harita 3 KB, oturuma yüklenir. Depo yapısı istendiği an 14 ms'de üretilir.
 
+## Kendini güncel tutar
+
+Her `dxc` çağrısında depolar taranır (150 ms). Değişiklik varsa harita tazelenir:
+
+| Ne değişti | Ne olur | Maliyet |
+|---|---|---|
+| Yeni depo | Yalnız onun açıklaması yazılır | ~10 sn |
+| Depo silindi | Haritadan düşer | 0 |
+| Dosya eklendi/silindi | Sayı ve tarih güncellenir | 0 |
+| **Klasör eklendi/adı değişti** | Açıklama yeniden yazılır | ~10 sn |
+| Hiçbiri | Model çağrılmaz | 0 |
+
+Kural tek: açıklama cümlesi klasör **adlarından** çıkarılır, o yüzden ad ağacı
+değişmediyse açıklama hâlâ geçerlidir. Dosya sayısının artması deponun ne iş
+yaptığını değiştirmez.
+
+Karşılaştırma için `~/.doguxclaude/durum.json` içinde depo başına 16 karakterlik
+bir parmak izi tutulur (ad ağacının özeti, sayılar hariç). Bu dosya hiçbir zaman
+oturuma yüklenmez.
+
 ## Algoritma
 
 Bir deponun yapısı üç kuralla kesilir:

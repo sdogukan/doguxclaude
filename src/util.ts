@@ -6,6 +6,8 @@ import { dirname, join } from 'node:path';
 
 export const KOK = process.env['DOGUXCLAUDE_KOK'] ?? join(homedir(), '.doguxclaude');
 export const HARITA_YOLU = join(KOK, 'index.md');
+/** İç durum: parmak izleri. Hiçbir zaman oturuma yüklenmez, yalnız kod okur. */
+export const DURUM_YOLU = join(KOK, 'durum.json');
 
 export function git(depo: string, ...args: string[]): string {
   try {
