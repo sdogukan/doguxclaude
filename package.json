@@ -1,0 +1,17 @@
+{
+  "name": "doguxclaude",
+  "version": "0.1.0",
+  "description": "Claude Code'u makinendeki depoların haritasıyla başlatır. Harita kodla çıkarılır, tek satırlık açıklamaları model yazar.",
+  "type": "module",
+  "bin": { "dxc": "dist/cli.js" },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test \"dist/**/*.test.js\"",
+    "prepare": "npm run build"
+  },
+  "engines": { "node": ">=22" },
+  "license": "MIT",
+  "author": "Doğukan Şahin",
+  "devDependencies": { "typescript": "^5.6.0", "@types/node": "^22.0.0" }
+}
