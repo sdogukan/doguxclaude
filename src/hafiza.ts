@@ -15,7 +15,13 @@ export const TAVAN = 30;
 
 const ISTEM = `Aşağıda bir çalışma oturumunun konuşması var (araç çıktıları yok, yalnız insan ve model metni).
 
-TEK cümle yaz: bu oturumda ne yapıldı ve nerede kalındı. En fazla 20 kelime.
+Tek satır yaz, tam olarak şu biçimde:
+<proje> | <tek cümle>
+
+<proje>: ÜZERİNDE ÇALIŞILAN projenin ya da deponun adı. Oturumun açıldığı klasör
+değil, işin geçtiği yer. Birden çoksa en çok çalışılanı yaz. Anlaşılmıyorsa "-" yaz.
+
+<tek cümle>: bu oturumda ne yapıldı ve nerede kalındı. En fazla 20 kelime.
 Somut ol: hangi karar, hangi iş, hangi açık nokta. Genel laf etme.
 
 Başka hiçbir şey yazma: giriş yok, tırnak yok, madde işareti yok.`;
@@ -72,16 +78,37 @@ export function konusmaKuyrugu(kayitYolu: string, tavanKarakter = 25_000): strin
   return tam.length > tavanKarakter ? tam.slice(-tavanKarakter) : tam;
 }
 
-/** Modeli bir kez çağırır. Başarısızsa null: hafıza yazılmaz, iş durmaz. */
-export function oturumCumlesi(konusma: string, zamanAsimiMs = 120_000): string | null {
+export interface OturumOzeti { proje: string | null; cumle: string }
+
+/** Modeli bir kez çağırır. Başarısızsa null: hafıza yazılmaz, iş durmaz.
+ *
+ *  Projeyi de model söyler, kod değil. Sebebi ölçüldü: oturum kök dizinde
+ *  açılıp başka bir depo üzerinde çalışılabiliyor; açılış klasörünü yazmak
+ *  yanıltıcı olurdu. Konuşma zaten modelin elinde, doğru cevabı o biliyor. */
+export function oturumCumlesi(konusma: string, zamanAsimiMs = 120_000): OturumOzeti | null {
   if (konusma.trim().length < 200) return null;   // konuşulmamış oturuma cümle yazma
   const r = spawnSync('claude', ['-p'], {
     input: `${ISTEM}\n\n---\n\n${konusma}`, encoding: 'utf8',
     timeout: zamanAsimiMs, maxBuffer: 8 * 1024 * 1024,
   });
   if (r.error || r.status !== 0 || !r.stdout) return null;
-  const c = r.stdout.trim().split('\n').map((s) => s.trim()).filter(Boolean)[0];
-  return c ? c.replace(/^[-*]\s*/, '').replace(/^["'«»]|["'«»]$/g, '').trim() : null;
+  const ham = r.stdout.trim().split('\n').map((s) => s.trim()).filter(Boolean)[0];
+  if (!ham) return null;
+  return ayristir(ham);
+}
+
+/** `proje | cümle` biçimini ayırır. Ayraç yoksa tamamı cümledir. */
+export function ayristir(satir: string): OturumOzeti {
+  const temiz = satir.replace(/^[-*]\s*/, '').trim();
+  const i = temiz.indexOf('|');
+  if (i < 0) return { proje: null, cumle: kirp(temiz) };
+  const proje = temiz.slice(0, i).trim().replace(/^["'`]|["'`]$/g, '');
+  const cumle = kirp(temiz.slice(i + 1));
+  return { proje: proje && proje !== '-' ? proje : null, cumle };
+}
+
+function kirp(s: string): string {
+  return s.trim().replace(/^["'«»]|["'«»]$/g, '').trim();
 }
 
 /** Oturum cümlesini haritanın hafıza bölümüne ekler. Harita bölümüne dokunmaz. */

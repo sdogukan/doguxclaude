@@ -3,14 +3,14 @@
  *
  *  İnsan yüzeyi tek komut: `dxc`. Diğerleri tanı içindir, ezberlenmesi gerekmez. */
 import { spawn } from 'node:child_process';
-import { rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { basename, join, resolve } from 'node:path';
+import { readdirSync, rmSync } from 'node:fs';
+import { homedir, tmpdir } from 'node:os';
+import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { depoBlogu } from './baglam.js';
-import { haritaOku, haritaTazele } from './harita.js';
+import { haritaOku, haritaTazele, mevcutAciklamalar } from './harita.js';
 import { konusmaKuyrugu, oturumCumlesi, oturumYaz } from './hafiza.js';
-import { ACILIS_DEPO, kancaCalistir, KOSU, kosuYolu } from './kanca.js';
+import { ACILIS_DEPO, kancaCalistir, KOSU, kosuYolu, OTURUM_DIZINI, projeAdi } from './kanca.js';
 import { kisaBaslik, ok, son, stdinBosalt, sure, tik, vurgu } from './ekran.js';
 import { depoOzeti } from './ozet.js';
 import { iceridekiDepo } from './tarama.js';
@@ -99,6 +99,7 @@ function kancaAyari(): string {
  *  0,2 sn'lik koşuyu altı satırlık banner ile boğmak istemiyoruz. */
 async function baslat(argv: string[], acik: Set<string>): Promise<number> {
   const t0 = Date.now();
+  yetimleriSupur();   // kapanışı kaçırılmış oturumlar burada toplanır
   // Nerede olduğumuz ucuz bilgi: kutuya girsin diye model çağrısından önce hesaplanır.
   const depo = iceridekiDepo(process.cwd());
   const nerede = depo ? basename(depo) : (basename(process.cwd()) || process.cwd());
@@ -130,7 +131,70 @@ async function baslat(argv: string[], acik: Set<string>): Promise<number> {
     });
     c.on('error', (e) => { console.error(hata('dxc', `claude başlatılamadı (${e.message})`, 'Claude CLI kurulu mu')); coz(127); });
     c.on('exit', (k) => { hafizayiArkadaYaz(kosu, nerede); coz(k ?? 0); });
+
+    // Pencere kapatılınca (Cmd+W) işletim sistemi SIGHUP gönderir ve dxc ölür;
+    // `exit` olayı hiç gelmez. O yüzden sinyali yakalayıp hafızayı ölmeden önce
+    // başlatıyoruz. Yazıcı `detached` olduğu için kendi süreç grubunda kalır ve
+    // bizimle birlikte ölmez. SIGINT yakalanmaz: Ctrl+C oturumu bitirmez,
+    // claude'un kendi işidir; yakalarsak yarım oturumu hafızaya yazarız.
+    for (const sinyal of ['SIGHUP', 'SIGTERM'] as const) {
+      process.once(sinyal, () => { hafizayiArkadaYaz(kosu, nerede); process.exit(0); });
+    }
   });
+}
+
+/** Kapanışı kaçırılmış oturumları toplar.
+ *
+ *  Neden gerekli (canlı oturumda ölçüldü): `dxc` claude'un çıkışını bekleyen ana
+ *  süreçtir. `/exit` ile çıkarsan hafıza yazılır. Ama terminal PENCERESİNİ
+ *  kapatırsan işletim sistemi dxc'yi de öldürür ve yazacak vakti olmaz; iz dosyası
+ *  ortada kalır. İnsanlar pencereyi kapatır, yani bu kenar durum değil.
+ *
+ *  Sinyal yakalamak yerine süpürme seçildi: SIGKILL ya da elektrik kesintisi de
+ *  yakalanmaz, süpürme hepsini toplar. İzin adındaki pid hâlâ yaşıyorsa o oturum
+ *  sürüyor demektir, ona dokunulmaz. */
+function yetimleriSupur(): void {
+  let adlar: string[];
+  try { adlar = readdirSync(OTURUM_DIZINI); } catch { return; }
+  for (const ad of adlar) {
+    const m = /^kosu-(\d+)-(\d+)\.txt$/.exec(ad);
+    if (!m) continue;
+    const pid = Number(m[1]);
+    const yas = Date.now() - Number(m[2]);
+    // Süreç yaşıyorsa oturum sürüyor. Bir günden eskiyse pid yeniden kullanılmış olabilir.
+    if (yas < 86_400_000 && yasiyor(pid)) continue;
+    const yol = join(OTURUM_DIZINI, ad);
+    const [kayit, proje] = (oku(yol) ?? '').split('\n');
+    try { rmSync(yol, { force: true }); } catch { /* yoksa sorun değil */ }
+    if (!kayit) continue;
+    arkaPlandaOzetle(kayit.trim(), (proje || projeyiYoldanCikar(kayit.trim())).trim());
+  }
+}
+
+/** Proje adı ize yazılmamışsa (eski biçim) kayıt yolundan çıkarır.
+ *  Claude Code kayıtları `~/.claude/projects/<slug>/` altında tutar; slug, çalışma
+ *  dizininin harf-rakam dışındaki her karakteri `-` yapılmış halidir. Haritadaki
+ *  depoların slug'ını hesaplayıp eşleştiriyoruz: tahmin değil, birebir karşılaştırma. */
+function projeyiYoldanCikar(kayitYolu: string): string {
+  const slug = basename(dirname(kayitYolu));
+  for (const goreli of mevcutAciklamalar().keys()) {
+    const tam = join(homedir(), goreli);
+    if (tam.replace(/[^A-Za-z0-9]/g, '-') === slug) return basename(tam);
+  }
+  // Depoya denk gelmiyorsa slug'ı yola çevirip klasör adını kullan.
+  // Slug'da her ayraç '-' olduğu için yol birebir geri gelmez; ad yeterli.
+  return projeAdi(slug === '-' ? '/' : slug.replace(/-/g, '/'));
+}
+
+function yasiyor(pid: number): boolean {
+  try { process.kill(pid, 0); return true; } catch { return false; }
+}
+
+/** Özetlemeyi ayrı, kopuk bir süreçte başlatır: terminal beklemez. */
+function arkaPlandaOzetle(kayit: string, proje: string): void {
+  const cocuk = spawn(process.execPath, [fileURLToPath(import.meta.url), 'hafiza-yaz', kayit, proje],
+    { detached: true, stdio: 'ignore' });
+  cocuk.unref();
 }
 
 /** Oturum kapanınca hafıza satırını ARKA PLANDA yazdırır: terminal anında geri döner.
@@ -139,18 +203,18 @@ function hafizayiArkadaYaz(kosu: string, proje: string): void {
   const isaret = kosuYolu(kosu);
   const kayit = oku(isaret);
   try { rmSync(isaret, { force: true }); } catch { /* yoksa sorun değil */ }
-  if (!kayit) return;
-  const cocuk = spawn(process.execPath, [fileURLToPath(import.meta.url), 'hafiza-yaz', kayit.trim(), proje],
-    { detached: true, stdio: 'ignore' });
-  cocuk.unref();
+  const [yolu, kayitliProje] = (kayit ?? '').split('\n');
+  if (!yolu) return;
+  arkaPlandaOzetle(yolu.trim(), (kayitliProje || proje).trim());
 }
 
 /** Arka plan komutu: konuşmayı özetleyip haritanın hafıza bölümüne ekler. */
 function komutHafizaYaz(konum: string[]): number {
   const [kayit, proje] = konum;
   if (!kayit || !proje) return 1;
-  const cumle = oturumCumlesi(konusmaKuyrugu(kayit));
-  if (cumle) oturumYaz(proje, cumle);
+  const o = oturumCumlesi(konusmaKuyrugu(kayit));
+  // Projeyi model söyler; söyleyemezse oturumun açıldığı yere düşülür.
+  if (o) oturumYaz(o.proje ?? proje, o.cumle);
   return 0;
 }
 

@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { istemdekiDepolar, karar, sadelestir } from './kanca.js';
+import { istemdekiDepolar, karar, projeAdi, sadelestir } from './kanca.js';
 
 /** Adı verilen bir git deposu kurar ve git'in bildirdiği kök yolu döner. */
 function depoKur(ad: string): string {
@@ -67,4 +67,11 @@ test('git deposu olmayan yerde ve ad geçmiyorsa hiçbir şey yazılmaz', () => 
   const bos = mkdtempSync(join(tmpdir(), 'dxc-bos-'));
   const k = karar('merhaba', bos, new Set(), []);
   assert.deepEqual(k.eklenen, []);
+});
+
+test('proje adı asla "bilinmeyen" olmaz', () => {
+  assert.equal(projeAdi('/'), 'kök dizin');
+  assert.equal(projeAdi('/Users/x/Projects/web-app'), 'web-app');
+  assert.equal(projeAdi('/Users/x'), 'x');
+  assert.notEqual(projeAdi(''), 'bilinmeyen');
 });

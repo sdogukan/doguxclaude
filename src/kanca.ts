@@ -39,7 +39,7 @@ export function kosuYolu(kosu: string): string {
   return join(OTURUM_DIZINI, `kosu-${kosu.replace(/[^A-Za-z0-9_-]/g, '')}.txt`);
 }
 
-const OTURUM_DIZINI = join(KOK, 'oturum');
+export const OTURUM_DIZINI = join(KOK, 'oturum');
 const OMUR_GUN = 7;
 
 function durumYolu(oturum: string): string {
@@ -82,6 +82,14 @@ export function istemdekiDepolar(istem: string, depolar: string[]): string[] {
   });
 }
 
+/** Hafıza satırında görünecek ad. Asla "bilinmeyen" dönmez: depoysa depo adı,
+ *  değilse klasör adı, kökse "kök dizin", hiçbiri değilse yolun kendisi. */
+export function projeAdi(yol: string): string {
+  const y = yol || process.cwd();
+  if (y === '/') return 'kök dizin';
+  return basename(y) || y;
+}
+
 export interface Karar { blok: string[]; eklenen: string[] }
 
 /** Saf karar: hiçbir şey yazmaz, yalnız ne enjekte edileceğini söyler. */
@@ -111,9 +119,14 @@ export async function kancaCalistir(): Promise<void> {
   const oturum = g.session_id ?? '';
   if (!oturum) return;
 
-  // Kayıt dosyasının yolunu dxc'ye bırak: çıkışta hafıza oradan yazılacak.
+  // Kayıt dosyasının yolunu ve proje adını dxc'ye bırak: çıkışta hafıza
+  // oradan yazılacak. İki satır, çünkü süpürücü kimin adına yazacağını bilmeli.
   const kosu = process.env[KOSU];
-  if (kosu && g.transcript_path) yaz(kosuYolu(kosu), g.transcript_path);
+  if (kosu && g.transcript_path) {
+    const acilisDepo = process.env[ACILIS_DEPO];
+    const proje = projeAdi(acilisDepo || iceridekiDepo(g.cwd ?? '') || g.cwd || '');
+    yaz(kosuYolu(kosu), `${g.transcript_path}\n${proje}`);
+  }
 
   const yol = durumYolu(oturum);
   const yazilmis = new Set((oku(yol) ?? '').split('\n').filter(Boolean));

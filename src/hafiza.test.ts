@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { birlestir, bolumler, ekle, HAFIZA_BASLIK, konusmaKuyrugu, TAVAN } from './hafiza.js';
+import { ayristir, birlestir, bolumler, ekle, HAFIZA_BASLIK, konusmaKuyrugu, TAVAN } from './hafiza.js';
 
 const HARITA = `# Harita
 
@@ -86,4 +86,22 @@ test('kuyruk tavanı aşılmaz, son kısım alınır', () => {
   assert.ok(k.length <= 5_000, `${k.length} > 5000`);
   assert.ok(k.includes('mesaj 199'), 'son mesaj korunmalı');
   assert.ok(!k.includes('mesaj 0 '), 'baştaki düşmeli');
+});
+
+test('model çıktısı proje ve cümleye ayrılır', () => {
+  const o = ayristir('web-app | Neon Postgres seçildi, DynamoDB elendi.');
+  assert.equal(o.proje, 'web-app');
+  assert.equal(o.cumle, 'Neon Postgres seçildi, DynamoDB elendi.');
+});
+
+test('proje bildirilmemişse null döner, cümle korunur', () => {
+  assert.equal(ayristir('- | Bir şeyler yapıldı.').proje, null);
+  assert.equal(ayristir('Ayraçsız tek cümle.').proje, null);
+  assert.equal(ayristir('Ayraçsız tek cümle.').cumle, 'Ayraçsız tek cümle.');
+});
+
+test('tırnak ve madde işareti temizlenir', () => {
+  const o = ayristir('- "api" | "Bir iş yapıldı."');
+  assert.equal(o.proje, 'api');
+  assert.equal(o.cumle, 'Bir iş yapıldı.');
 });
