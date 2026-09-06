@@ -14,32 +14,17 @@
 </p>
 
 ```
-
-
- ██╗ ██╗ ███████╗  █████╗
- ╚═╝██╔╝ ██╔════╝ ██╔══██╗    DAHA AZ TOKEN
-   ██╔╝  ███████╗ ╚█████╔╝    "nerede kaldım" sorusunda
-  ██╔╝   ╚════██║ ██╔══██╗    305K → 129K  ·  hafıza sayesinde
- ██╔╝██╗ ███████║ ╚█████╔╝
- ╚═╝ ╚═╝ ╚══════╝  ╚════╝
-
-
-
- ██╗ ██╗ ██╗  ██╗ ███████╗
- ╚═╝██╔╝ ██║  ██║ ╚════██║    DAHA HIZLI
-   ██╔╝  ███████║     ██╔╝    "nerede kaldım" sorusunda
-  ██╔╝   ╚════██║    ██╔╝     75 sn → 40 sn  ·  hafıza sayesinde
- ██╔╝██╗      ██║    ██║
- ╚═╝ ╚═╝      ╚═╝    ╚═╝
-
-
-
- ██╗ ██╗ ██████╗  ███████╗
- ╚═╝██╔╝ ╚════██╗ ██╔════╝    DAHA AZ TOKEN
-   ██╔╝   █████╔╝ ███████╗    "bu depo nedir" sorusunda
-  ██╔╝    ╚═══██╗ ╚════██║    107K → 70K  ·  harita + yapı sayesinde
- ██╔╝██╗ ██████╔╝ ███████║
- ╚═╝ ╚═╝ ╚═════╝  ╚══════╝
+╭──────────────────────┬──────────────────────┬──────────────────────╮
+│                      │                      │                      │
+│         %58          │         %47          │         %35          │
+│    DAHA AZ TOKEN     │      DAHA HIZLI      │    DAHA AZ TOKEN     │
+│                      │                      │                      │
+│   "nerede kaldım"    │   "nerede kaldım"    │   "bu depo nedir"    │
+│     305K → 129K      │    75 sn → 40 sn     │      107K → 70K      │
+│                      │                      │                      │
+│        hafıza        │        hafıza        │    harita + yapı     │
+╰──────────────────────┴──────────────────────┴──────────────────────╯
+          aynı sorular, dxc ile ve dxc olmadan · ikişer koşu          
 ```
 
 <p align="center"><sub>aynı sorular, <code>dxc</code> ile ve <code>dxc</code> olmadan · ikişer koşu · <a href="#ölçüm">ölçüm ayrıntısı</a></sub></p>
