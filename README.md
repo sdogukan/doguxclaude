@@ -12,6 +12,15 @@
   <img src="https://img.shields.io/badge/lisans-MIT-a855f7?labelColor=1a1a2e" alt="MIT">
 </p>
 
+<h3 align="center">
+  Alandaki her şey kurulum istiyor.<br>Bu, tek komut.
+</h3>
+
+<p align="center">
+  <sub>Ötekiler Obsidian kurdurur, Docker ayağa kaldırtır, 39 yer tutucu doldurtur.<br>
+  Burada kurulacak bir şey yok. Ezberlenecek komut yok.</sub>
+</p>
+
 ```
 ╭──────────────────────┬──────────────────────┬──────────────────────╮
 │                      │                      │                      │
@@ -30,12 +39,6 @@
 npm install -g doguxclaude
 dxc
 ```
-
-<p align="center">
-  <b>Alandaki her şey kurulum istiyor. Bu, tek komut.</b><br>
-  <sub>Ötekiler Obsidian kurdurur, Docker ayağa kaldırtır, 39 yer tutucu doldurtur.<br>
-  Burada kurulacak bir şey yok. Ezberlenecek komut yok. Sadece <code>dxc</code>.</sub>
-</p>
 
 ```
 
