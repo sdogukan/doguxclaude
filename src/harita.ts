@@ -8,7 +8,7 @@
  *  var olanlara dokunulmaz. Silinen depo haritadan düşer. */
 import { spawnSync } from 'node:child_process';
 import { homedir } from 'node:os';
-import { calisiyor, satir, son, sure, tik, vurgu } from './ekran.js';
+import { bekle, calisiyor, satir, son, sure, tik, vurgu } from './ekran.js';
 import { depoOzeti } from './ozet.js';
 import { Depo, depoBilgisi, depolariBul } from './tarama.js';
 import { durumOku, durumYaz, sekilIzi } from './durum.js';
@@ -98,6 +98,7 @@ export function haritaTazele(secenek: { zorla?: boolean; modelsiz?: boolean; ses
       const o = ozetler.get(d.goreli)!;
       return `## ${d.goreli}\n${o.dosyaSayisi} dosya · son değişiklik ${d.sonDegisiklik}\n\`\`\`\n${o.metin}\n\`\`\``;
     }).join('\n\n');
+    if (!secenek.sessiz) bekle(`${yeni.length} depo için açıklama yazılacak, ${yeni.length * 8} sn sürebilir`);
     const bitir = secenek.sessiz ? () => {}
       : calisiyor(`${yeni.length} depo için açıklama yazılıyor${yeni.length <= 3 ? `: ${yeni.join(', ')}` : ''}`);
     const t1 = Date.now();

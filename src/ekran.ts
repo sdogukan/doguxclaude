@@ -48,3 +48,32 @@ export function calisiyor(metin: string): (sonMetin?: string) => void {
     if (sonMetin) process.stderr.write(`${SOLUK}│${R} ${sonMetin}\n`);
   };
 }
+
+/** Uzun bekleme başlarken uyarı. Kullanıcı bu sırada yazarsa tuşlar terminal
+ *  arabelleğinde birikir ve claude açılınca ona gider; `stdinBosalt` onu temizler
+ *  ama önce kullanıcının beklemesi gerektiğini bilmesi daha iyi. */
+export function bekle(metin: string): void {
+  process.stderr.write(`${SOLUK}│${R} ${metin} ${SOLUK}— bu sırada yazma, tuşlar oturuma gider${R}\n`);
+}
+
+/** Bekleme sırasında basılan tuşları claude'a sızmadan temizler.
+ *  TTY değilse ya da temizlenemezse sessizce geçer: işi durdurmaz. */
+export function stdinBosalt(): number {
+  const g = process.stdin;
+  if (!g.isTTY || typeof g.setRawMode !== 'function') return 0;
+  let atilan = 0;
+  try {
+    g.setRawMode(true);
+    g.resume();
+    for (;;) {
+      const parca: unknown = g.read();
+      if (parca === null) break;
+      atilan += typeof parca === 'string' ? parca.length : (parca as Buffer).length;
+    }
+  } catch {
+    // raw mode desteklenmiyorsa sorun değil
+  } finally {
+    try { g.setRawMode(false); g.pause(); } catch { /* yok */ }
+  }
+  return atilan;
+}

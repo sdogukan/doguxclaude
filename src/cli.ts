@@ -6,7 +6,7 @@ import { spawn } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { basename, join, resolve } from 'node:path';
 import { haritaOku, haritaTazele } from './harita.js';
-import { baslik, satir, son, sure, tik, vurgu } from './ekran.js';
+import { baslik, satir, son, stdinBosalt, sure, tik, vurgu } from './ekran.js';
 import { depoOzeti } from './ozet.js';
 import { iceridekiDepo } from './tarama.js';
 import { hata, HARITA_YOLU, yaz } from './util.js';
@@ -96,6 +96,10 @@ async function baslat(argv: string[], acik: Set<string>): Promise<number> {
   const yol = join(tmpdir(), `dxc-${process.pid}.md`);
   yaz(yol, metin);
   const gecen = argv.filter((a) => a !== '--kuru');
+  // Bekleme sırasında basılan tuşlar terminal arabelleğinde birikir ve `stdio: 'inherit'`
+  // ile claude'a gider: kazara mesaj gönderilmiş olur. Devretmeden önce temizlenir.
+  const atilan = stdinBosalt();
+  if (atilan) satir(`${atilan} karakterlik tuş girişi atıldı (bekleme sırasında yazılmış)`);
   return await new Promise((coz) => {
     const c = spawn('claude', ['--append-system-prompt-file', yol, ...gecen], { stdio: 'inherit' });
     c.on('error', (e) => { console.error(hata('dxc', `claude başlatılamadı (${e.message})`, 'Claude CLI kurulu mu')); coz(127); });
