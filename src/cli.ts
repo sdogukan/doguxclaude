@@ -130,7 +130,7 @@ async function baslat(argv: string[], acik: Set<string>): Promise<number> {
       env: { ...process.env, [ACILIS_DEPO]: depo ?? '', [KOSU]: kosu },
     });
     c.on('error', (e) => { console.error(hata('dxc', `claude başlatılamadı (${e.message})`, 'Claude CLI kurulu mu')); coz(127); });
-    c.on('exit', (k) => { hafizayiArkadaYaz(kosu, nerede); coz(k ?? 0); });
+    c.on('exit', (k) => { hafizayiArkadaYaz(kosu, depo ? basename(depo) : '-'); coz(k ?? 0); });
 
     // Pencere kapatılınca (Cmd+W) işletim sistemi SIGHUP gönderir ve dxc ölür;
     // `exit` olayı hiç gelmez. O yüzden sinyali yakalayıp hafızayı ölmeden önce
@@ -138,7 +138,7 @@ async function baslat(argv: string[], acik: Set<string>): Promise<number> {
     // bizimle birlikte ölmez. SIGINT yakalanmaz: Ctrl+C oturumu bitirmez,
     // claude'un kendi işidir; yakalarsak yarım oturumu hafızaya yazarız.
     for (const sinyal of ['SIGHUP', 'SIGTERM'] as const) {
-      process.once(sinyal, () => { hafizayiArkadaYaz(kosu, nerede); process.exit(0); });
+      process.once(sinyal, () => { hafizayiArkadaYaz(kosu, depo ? basename(depo) : '-'); process.exit(0); });
     }
   });
 }
@@ -213,8 +213,9 @@ function komutHafizaYaz(konum: string[]): number {
   const [kayit, proje] = konum;
   if (!kayit || !proje) return 1;
   const o = oturumCumlesi(konusmaKuyrugu(kayit));
-  // Projeyi model söyler; söyleyemezse oturumun açıldığı yere düşülür.
-  if (o) oturumYaz(o.proje ?? proje, o.cumle);
+  // Klasörü model söyler; istem bunu zorunlu kılıyor. Yine de boş dönerse
+  // açılış yerine düşülür ki satır hiçbir zaman etiketsiz kalmasın.
+  if (o) oturumYaz(o.proje ?? (proje === '-' ? null : proje), o.cumle);
   return 0;
 }
 

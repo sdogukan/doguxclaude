@@ -16,10 +16,16 @@ export const TAVAN = 30;
 const ISTEM = `Aşağıda bir çalışma oturumunun konuşması var (araç çıktıları yok, yalnız insan ve model metni).
 
 Tek satır yaz, tam olarak şu biçimde:
-<proje> | <tek cümle>
+<klasörler> | <tek cümle>
 
-<proje>: ÜZERİNDE ÇALIŞILAN projenin ya da deponun adı. Oturumun açıldığı klasör
-değil, işin geçtiği yer. Birden çoksa en çok çalışılanı yaz. Anlaşılmıyorsa "-" yaz.
+<klasörler>: ÜZERİNDE ÇALIŞILAN proje/depo KÖKLERİNİN adları. Oturumun açıldığı
+yer DEĞİL, işin geçtiği yer. BU ALAN ZORUNLUDUR, boş bırakma.
+
+  - Yalnız KÖK adını yaz. Alt klasör yazma: "packages/api" değil, deponun adı.
+  - Tam yol yazma, sadece son parça.
+  - Birden çok proje varsa virgülle ayır, en çok çalışılan başta, en fazla üçü.
+  - Konuşmada dosya yolları, komutlar ve depo adları geçer; oradan çıkar.
+    Örneğin "~/Projects/web-app/README.md" geçiyorsa klasör "web-app"tir.
 
 <tek cümle>: bu oturumda ne yapıldı ve nerede kalındı. En fazla 20 kelime.
 Somut ol: hangi karar, hangi iş, hangi açık nokta. Genel laf etme.
@@ -78,7 +84,11 @@ export function konusmaKuyrugu(kayitYolu: string, tavanKarakter = 25_000): strin
   return tam.length > tavanKarakter ? tam.slice(-tavanKarakter) : tam;
 }
 
-export interface OturumOzeti { proje: string | null; cumle: string }
+export interface OturumOzeti {
+  /** Üzerinde çalışılan klasör adları, virgülle. Model söyleyemediyse null. */
+  proje: string | null;
+  cumle: string;
+}
 
 /** Modeli bir kez çağırır. Başarısızsa null: hafıza yazılmaz, iş durmaz.
  *
@@ -97,25 +107,33 @@ export function oturumCumlesi(konusma: string, zamanAsimiMs = 120_000): OturumOz
   return ayristir(ham);
 }
 
-/** `proje | cümle` biçimini ayırır. Ayraç yoksa tamamı cümledir. */
+/** `klasörler | cümle` biçimini ayırır. Ayraç yoksa tamamı cümledir.
+ *  Klasör listesi virgüllü olabilir; en fazla üçe kırpılır. */
 export function ayristir(satir: string): OturumOzeti {
   const temiz = satir.replace(/^[-*]\s*/, '').trim();
   const i = temiz.indexOf('|');
   if (i < 0) return { proje: null, cumle: kirp(temiz) };
-  const proje = temiz.slice(0, i).trim().replace(/^["'`]|["'`]$/g, '');
+  const ham = temiz.slice(0, i).replace(/["'`]/g, '');
+  // Model yine de yol verirse son parçayı al: hafızada kök adı görünmeli.
+  const adlar = ham.split(',').map((s) => s.trim().replace(/\/+$/, '').split('/').pop()!.trim())
+    .filter((s) => s && s !== '-' && s !== '~').slice(0, 3);
   const cumle = kirp(temiz.slice(i + 1));
-  return { proje: proje && proje !== '-' ? proje : null, cumle };
+  return { proje: adlar.length ? adlar.join(', ') : null, cumle };
 }
 
 function kirp(s: string): string {
   return s.trim().replace(/^["'«»]|["'«»]$/g, '').trim();
 }
 
-/** Oturum cümlesini haritanın hafıza bölümüne ekler. Harita bölümüne dokunmaz. */
-export function oturumYaz(proje: string, cumle: string): void {
+/** Oturum cümlesini haritanın hafıza bölümüne ekler. Harita bölümüne dokunmaz.
+ *
+ *  Klasör bilinmiyorsa etiket HİÇ yazılmaz. Yanlış etiket ("kök dizin" gibi)
+ *  bilgi değil gürültüdür: oturum kökte açılıp başka bir depoda çalışılmış
+ *  olabilir ve okuyan yanılır. */
+export function oturumYaz(proje: string | null, cumle: string): void {
   const icerik = oku(HARITA_YOLU);
   if (!icerik) return;                            // harita yoksa yazacak yer de yok
   const { harita, hafiza } = bolumler(icerik);
-  const satir = `- ${bugun()} · ${proje} · ${cumle}`;
+  const satir = proje ? `- ${bugun()} · ${proje} · ${cumle}` : `- ${bugun()} · ${cumle}`;
   yaz(HARITA_YOLU, birlestir(harita, ekle(hafiza, satir)));
 }

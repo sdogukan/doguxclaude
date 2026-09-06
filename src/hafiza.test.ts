@@ -105,3 +105,26 @@ test('tırnak ve madde işareti temizlenir', () => {
   assert.equal(o.proje, 'api');
   assert.equal(o.cumle, 'Bir iş yapıldı.');
 });
+
+test('birden çok klasör virgülle ayrılır, üçle sınırlanır', () => {
+  const o = ayristir('web-app, api-platform, notes, fazlalik | Bir iş yapıldı.');
+  assert.equal(o.proje, 'web-app, api-platform, notes');
+  assert.equal(o.cumle, 'Bir iş yapıldı.');
+});
+
+test('boş ve tire klasörler atılır', () => {
+  assert.equal(ayristir('-, , web-app | X yapıldı.').proje, 'web-app');
+  assert.equal(ayristir('- | X yapıldı.').proje, null);
+});
+
+test('alt klasör yolu verilirse yalnız son parça kalır', () => {
+  assert.equal(ayristir('packages/api | X.').proje, 'api');
+  assert.equal(ayristir('~/Projects/web-app | X.').proje, 'web-app');
+});
+
+test('klasör bilinmiyorsa etiket hiç yazılmaz', () => {
+  const bicim = (p: string | null) => (p ? `- 2026-01-01 · ${p} · X.` : `- 2026-01-01 · X.`);
+  assert.ok(!bicim(null).includes('·  ·'), 'boş etiket bırakılmamalı');
+  assert.equal(bicim(null).split('·').length, 2, 'tek ayraç kalmalı');
+  assert.equal(bicim('web-app').split('·').length, 3);
+});

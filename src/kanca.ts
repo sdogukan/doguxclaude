@@ -124,7 +124,9 @@ export async function kancaCalistir(): Promise<void> {
   const kosu = process.env[KOSU];
   if (kosu && g.transcript_path) {
     const acilisDepo = process.env[ACILIS_DEPO];
-    const proje = projeAdi(acilisDepo || iceridekiDepo(g.cwd ?? '') || g.cwd || '');
+    // Depo değilse '-' bırakılır: yanlış etiket yazmaktansa etiketsiz yazılır.
+    const depo = acilisDepo || iceridekiDepo(g.cwd ?? '');
+    const proje = depo ? projeAdi(depo) : '-';
     yaz(kosuYolu(kosu), `${g.transcript_path}\n${proje}`);
   }
 
