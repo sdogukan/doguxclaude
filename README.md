@@ -16,30 +16,30 @@
 ```
 
 
- ███████╗  █████╗  ██╗ ██╗
- ██╔════╝ ██╔══██╗ ╚═╝██╔╝    DAHA AZ TOKEN
- ███████╗ ╚█████╔╝   ██╔╝     "nerede kaldım" sorusunda
- ╚════██║ ██╔══██╗  ██╔╝      305K → 129K  ·  hafıza sayesinde
- ███████║ ╚█████╔╝ ██╔╝██╗
- ╚══════╝  ╚════╝  ╚═╝ ╚═╝
+ ██╗ ██╗ ███████╗  █████╗
+ ╚═╝██╔╝ ██╔════╝ ██╔══██╗    DAHA AZ TOKEN
+   ██╔╝  ███████╗ ╚█████╔╝    "nerede kaldım" sorusunda
+  ██╔╝   ╚════██║ ██╔══██╗    305K → 129K  ·  hafıza sayesinde
+ ██╔╝██╗ ███████║ ╚█████╔╝
+ ╚═╝ ╚═╝ ╚══════╝  ╚════╝
 
 
 
- ██╗  ██╗ ███████╗ ██╗ ██╗
- ██║  ██║ ╚════██║ ╚═╝██╔╝    DAHA HIZLI
- ███████║     ██╔╝   ██╔╝     "nerede kaldım" sorusunda
- ╚════██║    ██╔╝   ██╔╝      75 sn → 40 sn  ·  hafıza sayesinde
-      ██║    ██║   ██╔╝██╗
-      ╚═╝    ╚═╝   ╚═╝ ╚═╝
+ ██╗ ██╗ ██╗  ██╗ ███████╗
+ ╚═╝██╔╝ ██║  ██║ ╚════██║    DAHA HIZLI
+   ██╔╝  ███████║     ██╔╝    "nerede kaldım" sorusunda
+  ██╔╝   ╚════██║    ██╔╝     75 sn → 40 sn  ·  hafıza sayesinde
+ ██╔╝██╗      ██║    ██║
+ ╚═╝ ╚═╝      ╚═╝    ╚═╝
 
 
 
- ██████╗  ███████╗ ██╗ ██╗
- ╚════██╗ ██╔════╝ ╚═╝██╔╝    DAHA AZ TOKEN
-  █████╔╝ ███████╗   ██╔╝     "bu depo nedir" sorusunda
-  ╚═══██╗ ╚════██║  ██╔╝      107K → 70K  ·  harita + yapı sayesinde
- ██████╔╝ ███████║ ██╔╝██╗
- ╚═════╝  ╚══════╝ ╚═╝ ╚═╝
+ ██╗ ██╗ ██████╗  ███████╗
+ ╚═╝██╔╝ ╚════██╗ ██╔════╝    DAHA AZ TOKEN
+   ██╔╝   █████╔╝ ███████╗    "bu depo nedir" sorusunda
+  ██╔╝    ╚═══██╗ ╚════██║    107K → 70K  ·  harita + yapı sayesinde
+ ██╔╝██╗ ██████╔╝ ███████║
+ ╚═╝ ╚═╝ ╚═════╝  ╚══════╝
 ```
 
 <p align="center"><sub>aynı sorular, <code>dxc</code> ile ve <code>dxc</code> olmadan · ikişer koşu · <a href="#ölçüm">ölçüm ayrıntısı</a></sub></p>
