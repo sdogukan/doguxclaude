@@ -9,22 +9,22 @@
   <a href="https://www.npmjs.com/package/doguxclaude"><img src="https://img.shields.io/npm/v/doguxclaude?color=a855f7&labelColor=1a1a2e&label=npm" alt="npm"></a>
   <img src="https://img.shields.io/badge/node-%E2%89%A522-22d3ee?labelColor=1a1a2e" alt="node">
   <img src="https://img.shields.io/badge/token-%2535%20daha%20az-a855f7?labelColor=1a1a2e" alt="%35 daha az token">
-  <img src="https://img.shields.io/badge/haf%C4%B1za-%2558%20daha%20az-22d3ee?labelColor=1a1a2e" alt="hafıza %58 daha az">
+  <img src="https://img.shields.io/badge/haf%C4%B1za-%2562%20daha%20az-22d3ee?labelColor=1a1a2e" alt="hafıza %62 daha az">
   <img src="https://img.shields.io/badge/lisans-MIT-22d3ee?labelColor=1a1a2e" alt="MIT">
 </p>
 
 ```
 ╭──────────────────────┬──────────────────────┬──────────────────────╮
 │                      │                      │                      │
-│         %58          │         %47          │         %35          │
+│         %62          │         %49          │         %35          │
 │    DAHA AZ TOKEN     │      DAHA HIZLI      │    DAHA AZ TOKEN     │
 │                      │                      │                      │
 │   "nerede kaldım"    │   "nerede kaldım"    │   "bu depo nedir"    │
-│     305K → 129K      │    75 sn → 40 sn     │      107K → 70K      │
+│     357K → 136K      │    82 sn → 41 sn     │      107K → 70K      │
 │                      │                      │                      │
 │        hafıza        │        hafıza        │    harita + yapı     │
 ╰──────────────────────┴──────────────────────┴──────────────────────╯
-          aynı sorular, dxc ile ve dxc olmadan · ikişer koşu          
+           aynı sorular, dxc ile ve dxc olmadan · üçer koşu           
 ```
 
 <p align="center"><sub>aynı sorular, <code>dxc</code> ile ve <code>dxc</code> olmadan · ikişer koşu · <a href="#ölçüm">ölçüm ayrıntısı</a></sub></p>
@@ -120,12 +120,16 @@ Aynı sorular, `dxc` ile ve `dxc` olmadan, her biri ikişer koşu.
 | Soru | Token | Süre | Tur |
 |---|---|---|---|
 | "Bu depo nedir, nerede" <br><sub>harita + yapı sayesinde</sub> | 107K → **70K** · %35 az | 22,0 → **14,3 sn** · %35 hızlı | 5,8 → 4,5 |
-| "Nerede kalmıştım" <br><sub>hafıza sayesinde</sub> | 305K → **129K** · %58 az | 75,3 → **40,2 sn** · %47 hızlı | 17,0 → 8,5 |
+| "Nerede kalmıştım" <br><sub>hafıza sayesinde</sub> | 357K → **136K** · %62 az | 81,5 → **41,3 sn** · %49 hızlı | 19,7 → 12,0 |
 
 Hafızasız oturumda model ne yaptığını **dosyalardan kazıyor**: git kayıtlarına
 bakıyor, dosya saatlerine bakıyor, README'yi, tasarım notlarını ve kaynak
-dosyaları açıyor. On dört komut, yetmiş beş saniye. Hafıza satırı elindeyken
+dosyaları açıyor. Yaklaşık yirmi tur, seksen saniye. Hafıza satırı elindeyken
 cevabı zaten biliyor, kalan iş yalnız doğrulamak.
+
+Maliyet de **öngörülebilir** hale geliyor. Hafızasız üç koşu 196K, 412K ve 463K
+token harcadı, arada iki buçuk kat fark var: model her seferinde başka bir kazı
+yolu deniyor. Hafızalı koşular 99K, 147K ve 163K.
 
 **Her zaman kazanmaz.** Ölçtüğüm dördüncü bir senaryoda kaybetti: küçük bir
 depoda "paketler ne işe yarıyor" gibi zaten derine inen bir soruda yapıyı
@@ -134,8 +138,10 @@ dxc "bu nedir, nerede, hangi dosya var" sorularında kazandırır; zaten kazı
 gerektiren bir soruda etkisi küçülür.
 
 <sub>Ölçüm: iki depo (28 ve 1.120 dosya), iki soru tipi, hafıza için ayrı bir
-senaryo, her yapılandırma ikişer koşu, bu makine. Token, girdi ve önbellek
-dahil toplam işlenen jetondur; `claude -p --output-format json` çıktısından.</sub>
+senaryo. Harita ve yapı senaryolarında ikişer, hafızada üçer koşu, bu makine.
+Hafıza satırları elle yazılmadı, sistemin gerçek oturum kayıtlarından ürettiği
+satırlar kullanıldı. Token, girdi ve önbellek dahil toplam işlenen jetondur;
+`claude -p --output-format json` çıktısından.</sub>
 
 ---
 
@@ -224,10 +230,15 @@ a **map** of every git repo (one line each), the **structure** of the repo you
 ask about (injected the moment you name it, extracted from code in 10 ms), and
 a **memory** of your last 30 sessions (one sentence each, written on exit).
 
-**Measured across two repos and two question types, two runs each. On "what is
-this repo" questions: 31% fewer tokens, 40% faster, 38% fewer turns.** Averaged
-over all four scenarios it is 24% and 22%. One scenario got worse, a deep question
-in a tiny repo, and it is in the table below rather than hidden.
+**Measured, same questions with and without dxc.** On "where did I leave off",
+memory cuts **62% of the tokens** and **49% of the time** (357K → 136K, 82 s → 41 s).
+On "what is this repo", the map and structure cut **35%** of both. One scenario
+got worse, a deep question in a tiny repo, and it is in the table below rather
+than hidden.
+
+Cost also becomes predictable. Without memory, three runs of the same question
+spent 196K, 412K and 463K tokens: the agent improvises a different dig each time.
+With memory: 99K, 147K, 163K.
 
 Structure is a reading, not a judgement, so code does it. Only the one-line
 description is a judgement, so the model does it once per repo. Scanning 11 repos
