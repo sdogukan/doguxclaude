@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <sub>English · <a href="https://github.com/sdogukan/doguxclaude/blob/main/README.tr.md">Türkçe</a></sub>
+  <sub>English · <a href="https://github.com/sdogukan/doguxclaude/blob/main/docs/README.tr.md">Türkçe</a></sub>
 </p>
 
 <h3 align="center">

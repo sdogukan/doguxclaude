@@ -250,7 +250,7 @@ dxc reset      haritayı sıfırdan üret
 
 Hepsi bu. `~/.claude/settings.json` dosyana hiçbir şey yazılmaz.
 
-Kurallar ve ölçümler: [`NE-YAPIYOR.md`](NE-YAPIYOR.md) · Tasarım: [`TASLAK.md`](TASLAK.md)
+Kurallar ve ölçümler: [`NE-YAPIYOR.md`](../NE-YAPIYOR.md) · Tasarım: [`TASLAK.md`](../TASLAK.md)
 
 ---
 
