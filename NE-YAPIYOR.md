@@ -211,7 +211,9 @@ iş akışıyla üretildiği görünür.
 | package.json sürümü etiketle aynı olmalı | yanlış etiket yanlış sürümü yayınlamasın |
 | sürüm kayıt defterinde yoksa yayınlanır | npm'in anlaşılmaz 403'ü yerine açık mesaj |
 
-Derleme ve testler yayından önce koşar; biri düşerse yayın olmaz.
+Derleme ve testler yayından önce koşar; biri düşerse yayın olmaz. Yayın
+başarılıysa aynı etiketten bir GitHub Release açılır: GitHub'ın "Latest"
+release'i ile npm'in `latest` etiketi hep aynı sürümü gösterir.
 
 Etiketi bu iş akışından **önce** itilmiş bir sürüm için elle tetikleme var
 (Actions → Publish → Run workflow). Aynı denetimler geçerli: sürümün etiketi

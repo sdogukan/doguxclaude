@@ -13,6 +13,9 @@
 #
 # Her iki yolda da kayıt defterinde zaten olan sürüm yeniden yayınlanmaz;
 # npm'in anlaşılmaz 403'ü yerine açık bir mesajla durulur.
+#
+# Yayın başarılıysa aynı etiketten GitHub Release açılır: GitHub'ın "Latest"
+# release'i ile npm'in `latest` etiketi hep aynı sürümü gösterir.
 name: Publish
 
 on:
@@ -22,7 +25,7 @@ on:
 
 permissions:
   id-token: write   # OIDC kimliği için zorunlu
-  contents: read
+  contents: write  # yayından sonra GitHub Release açmak için
 
 concurrency:
   group: publish
@@ -66,3 +69,11 @@ jobs:
       - run: npm run build
       - run: npm test
       - run: npm publish
+
+      - name: GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          gh release create "v$SURUM" --verify-tag --title "v$SURUM" --generate-notes \
+            --notes "Published to npm: https://www.npmjs.com/package/doguxclaude/v/$SURUM"
