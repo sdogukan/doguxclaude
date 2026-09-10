@@ -14,19 +14,19 @@ import { ACILIS_DEPO, kancaCalistir, KOSU, kosuYolu, OTURUM_DIZINI, projeAdi } f
 import { kisaBaslik, ok, son, stdinBosalt, sure, tik, vurgu } from './ekran.js';
 import { depoOzeti } from './ozet.js';
 import { iceridekiDepo } from './tarama.js';
-import { hata, HARITA_YOLU, oku, yaz } from './util.js';
+import { cogul, hata, HARITA_YOLU, oku, yaz } from './util.js';
 
 /** Git deposu olmayan klasör için soluk not. */
-const GIT_YOK = ' \x1b[2m(git deposu değil, yapı verilmedi)\x1b[0m';
+const GIT_YOK = ' \x1b[2m(not a git repo, no structure given)\x1b[0m';
 
-const KULLANIM = `dxc — Claude'u makinendeki depoların haritasıyla başlatır
+const KULLANIM = `dxc — starts Claude with a map of the git repos on your machine
 
-  dxc            başlat. Kurulum yok, yapılandırma yok, ezberlenecek komut yok.
-                 Claude bayrakları olduğu gibi geçer.
+  dxc            start. No setup, no config, no commands to memorize.
+                 Claude flags pass through as they are.
 
-  dxc sifirla    haritayı sıfırdan üret. Bir depo yanlış anlaşıldıysa kullan.
+  dxc reset      rebuild the map from scratch. Use it when a repo was misread.
 
-Tanı komutları (gerekmez): --kuru, harita, ozet
+Diagnostics (not needed): --dry, map, summary
 `;
 
 function bayraklar(argv: string[]): { acik: Set<string>; konum: string[] } {
@@ -38,21 +38,21 @@ function bayraklar(argv: string[]): { acik: Set<string>; konum: string[] } {
 function komutOzet(konum: string[]): number {
   const hedef = resolve(konum[0] ?? '.');
   const depo = iceridekiDepo(hedef);
-  if (!depo) { console.error(hata('ozet', `${hedef} bir git deposu değil`, 'depo içinde çalıştır')); return 1; }
+  if (!depo) { console.error(hata('summary', `${hedef} is not a git repo`, 'run it inside a repo')); return 1; }
   const t0 = Date.now();
   const o = depoOzeti(depo);
-  console.log(`# ${basename(depo)}\n\n${o.dosyaSayisi} dosya · ${Date.now() - t0} ms\n\n${o.metin}`);
+  console.log(`# ${basename(depo)}\n\n${cogul(o.dosyaSayisi, 'file')} · ${Date.now() - t0} ms\n\n${o.metin}`);
   return 0;
 }
 
 async function komutHarita(acik: Set<string>): Promise<number> {
-  if (acik.has('goster')) {
+  if (acik.has('show')) {
     const h = haritaOku();
-    if (!h) { console.error(hata('harita', 'harita yok', 'dxc ile üret')); return 1; }
+    if (!h) { console.error(hata('map', 'no map yet', 'run dxc to build it')); return 1; }
     console.log(h); return 0;
   }
-  const s = await haritaTazele({ zorla: acik.has('zorla'), modelsiz: acik.has('modelsiz') });
-  son(`${tik()} harita ${vurgu(HARITA_YOLU)} ${sure(s.kodMs + s.modelMs)}`);
+  const s = await haritaTazele({ zorla: acik.has('force'), modelsiz: acik.has('no-model') });
+  son(`${tik()} map ${vurgu(HARITA_YOLU)} ${sure(s.kodMs + s.modelMs)}`);
   return 0;
 }
 
@@ -73,12 +73,12 @@ async function baglam(ekSatir?: string): Promise<string> {
   const parcalar: string[] = [];
   const harita = await haritaSagla(ekSatir);
   if (harita) parcalar.push(harita);
-  else parcalar.push('# Harita\n\nÜretilemedi.');
+  else parcalar.push('# Map\n\nCould not be generated.');
 
   if (depo) {
     parcalar.push(`\n---\n\n${depoBlogu(depo)}`);
   } else {
-    parcalar.push(`\n---\n\n# Bu klasör\n\n${cwd} — git deposu değil, yapı çıkarılmadı.`);
+    parcalar.push(`\n---\n\n# This folder\n\n${cwd} — not a git repo, no structure extracted.`);
   }
   return parcalar.join('\n');
 }
@@ -101,24 +101,24 @@ async function baslat(argv: string[], acik: Set<string>): Promise<number> {
   // Nerede olduğumuz ucuz bilgi: kutuya girsin diye model çağrısından önce hesaplanır.
   const depo = iceridekiDepo(process.cwd());
   const nerede = depo ? basename(depo) : (basename(process.cwd()) || process.cwd());
-  const buradaSatiri = `${ok()} buradasın: ${vurgu(nerede)}${depo ? '' : GIT_YOK}`;
+  const buradaSatiri = `${ok()} you are here: ${vurgu(nerede)}${depo ? '' : GIT_YOK}`;
 
   const metin = await baglam(buradaSatiri);
   const gecen = Date.now() - t0;
 
   if (sonTazeleme.isVar) {
-    son(`${tik()} ${acik.has('kuru') ? 'kuru koşu' : 'claude başlatılıyor'} ${sure(gecen)}`);
+    son(`${tik()} ${acik.has('dry') ? 'dry run' : 'starting claude'} ${sure(gecen)}`);
   } else {
-    kisaBaslik(`${vurgu(String(sonTazeleme.depoSayisi))} depo · ${vurgu(nerede)}${depo ? '' : GIT_YOK}`, gecen);
+    kisaBaslik(`${vurgu(String(sonTazeleme.depoSayisi))} ${sonTazeleme.depoSayisi === 1 ? 'repo' : 'repos'} · ${vurgu(nerede)}${depo ? '' : GIT_YOK}`, gecen);
   }
-  if (acik.has('kuru')) { console.log(metin); return 0; }
+  if (acik.has('dry')) { console.log(metin); return 0; }
   const yol = join(tmpdir(), `dxc-${process.pid}.md`);
   yaz(yol, metin);
-  const claudeBayraklari = argv.filter((a) => a !== '--kuru');
+  const claudeBayraklari = argv.filter((a) => a !== '--dry');
   // Bekleme sırasında basılan tuşlar terminal arabelleğinde birikir ve `stdio: 'inherit'`
   // ile claude'a gider: kazara mesaj gönderilmiş olur. Devretmeden önce temizlenir.
   const atilan = stdinBosalt();
-  if (atilan) process.stderr.write(` ${atilan} karakterlik tuş girişi atıldı (bekleme sırasında yazılmıştı)\n`);
+  if (atilan) process.stderr.write(` ${atilan} characters of keyboard input discarded (typed while waiting)\n`);
   const kosu = `${process.pid}-${Date.now()}`;
   return await new Promise((coz) => {
     const c = spawn('claude', ['--append-system-prompt-file', yol, '--settings', kancaAyari(), ...claudeBayraklari], {
@@ -127,7 +127,7 @@ async function baslat(argv: string[], acik: Set<string>): Promise<number> {
       // KOSU: kanca oturumun kayıt dosyasını bu kimlikle bıraksın, çıkışta okunsun.
       env: { ...process.env, [ACILIS_DEPO]: depo ?? '', [KOSU]: kosu },
     });
-    c.on('error', (e) => { console.error(hata('dxc', `claude başlatılamadı (${e.message})`, 'Claude CLI kurulu mu')); coz(127); });
+    c.on('error', (e) => { console.error(hata('dxc', `claude could not be started (${e.message})`, 'is the Claude CLI installed?')); coz(127); });
     c.on('exit', (k) => { hafizayiArkadaYaz(kosu, depo ? basename(depo) : '-'); coz(k ?? 0); });
 
     // Pencere kapatılınca (Cmd+W) işletim sistemi SIGHUP gönderir ve dxc ölür;
@@ -225,13 +225,13 @@ async function ana(): Promise<number> {
   if (ilk === 'kanca') { try { await kancaCalistir(); } catch { /* sessiz */ } return 0; }
   if (ilk === 'help' || ilk === '--help' || ilk === '-h') { console.log(KULLANIM); return 0; }
   if (ilk === 'hafiza-yaz') return komutHafizaYaz(argv.slice(1));
-  // 'sifirla' insan yüzeyidir; 'harita' ve 'ozet' tanı içindir, ezberlenmesi gerekmez.
-  if (ilk === 'sifirla') return komutHarita(new Set(['zorla']));
-  const bilinen = new Set(['harita', 'ozet']);
+  // 'reset' insan yüzeyidir; 'map' ve 'summary' tanı içindir, ezberlenmesi gerekmez.
+  if (ilk === 'reset') return komutHarita(new Set(['force']));
+  const bilinen = new Set(['map', 'summary']);
   const komut = ilk && bilinen.has(ilk) ? ilk : null;
   const { acik, konum } = bayraklar(komut ? argv.slice(1) : argv);
-  if (komut === 'ozet') return komutOzet(konum);
-  if (komut === 'harita') return komutHarita(acik);
+  if (komut === 'summary') return komutOzet(konum);
+  if (komut === 'map') return komutHarita(acik);
   return await baslat(argv, acik);
 }
 

@@ -59,17 +59,21 @@ dxc
 
    dogu x claude  ·  Dogu X Vibes
 
-╭──────────────────────────────────────╮
-│ ▸ 11 depo tarandı 220 ms             │
-│ + Projects/web-app yeni depo         │
-│ ~ Desktop/doguxclaude yapısı değişti │
-│ ▸ buradasın: api-platform            │
-╰──────────────────────────────────────╯
- ✔ claude başlatılıyor 187 ms
+╭─────────────────────────────────────────╮
+│ ▸ 11 repos scanned in 220 ms            │
+│ + Projects/web-app new repo             │
+│ ~ Desktop/doguxclaude structure changed │
+│ ▸ you are here: api-platform            │
+╰─────────────────────────────────────────╯
+ ✔ starting claude 187 ms
 ```
 
 <p align="center">
   <b>Her açılışta sıfır model çağrısı.</b> Harita güncelse tarama 250 ms, oturum açılır.
+</p>
+
+<p align="center">
+  <sub>Ürün küresel; terminal çıktısı, harita ve hafıza cümleleri İngilizcedir.</sub>
 </p>
 
 ---
@@ -197,11 +201,11 @@ Sen çıkarken o oturum tek cümleye iner ve haritanın altına yazılır. Ertes
 `dxc` yazdığında nerede kaldığın zaten orada.
 
 ```
-## Hafıza
+## Memory
 
-- 2026-09-06 · doguxclaude · Kanca sorulan deponun yapısını verecek şekilde
-  değişti; npm yayını erişim anahtarına takıldı.
-- 2026-09-05 · api-platform · Fargate akışı planlandı, CDK stack açık kaldı.
+- 2026-09-06 · doguxclaude · Hook changed to inject the structure of the repo
+  being asked about; npm publish blocked on an access token.
+- 2026-09-05 · api-platform · Fargate flow planned, CDK stack left open.
 ```
 
 Otuz satır tavanı var, dosya şişmez. Arka planda koşar, terminal anında geri gelir.
@@ -241,7 +245,7 @@ ve önbellek dahil toplam işlenen jetondur; `claude -p --output-format json`
 
 ```
 dxc            başlat
-dxc sifirla    haritayı sıfırdan üret
+dxc reset      haritayı sıfırdan üret
 ```
 
 Hepsi bu. `~/.claude/settings.json` dosyana hiçbir şey yazılmaz.

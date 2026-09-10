@@ -4,17 +4,18 @@
  *  içinde depo değişince (kanca). Tek yerde durur ki ikisi ayrışmasın. */
 import { basename } from 'node:path';
 import { depoOzeti } from './ozet.js';
+import { cogul } from './util.js';
 
 /** Yapının nasıl kullanılacağı. Liste tek başına yönlendirmiyor: ölçüldü,
  *  ajan yapıyı elinde olduğu halde `ls` ile baştan keşfetti (6 araç çağrısı). */
 export const YONERGE = [
-  'Aşağıdaki klasör yapısı `git ls-files` çıktısından üretildi ve günceldir.',
-  'Yapıyı öğrenmek için `ls`, `find`, `tree` çalıştırma; sayılar klasörün altındaki dosya sayısıdır.',
-  'Bu özet dosya İÇERİĞİNİ, satır sayılarını ve fonksiyon adlarını içermez; onlar gerekiyorsa doğrudan ilgili dosyayı oku.',
-  'Deponun kendi CLAUDE.md dosyası varsa geçerliliğini korur: bu özet onun yerine geçmez, yalnız yapıyı tekrar keşfetme yükünü kaldırır.',
+  'The folder structure below was generated from `git ls-files` and is current.',
+  'Do not run `ls`, `find` or `tree` to learn the structure; the numbers are file counts under each folder.',
+  'This summary does not include file CONTENTS, line counts or function names; when you need those, read the relevant file directly.',
+  'If the repo has its own CLAUDE.md it still applies: this summary does not replace it, it only removes the cost of rediscovering the structure.',
 ].join('\n');
 
 export function depoBlogu(depo: string): string {
   const o = depoOzeti(depo);
-  return `# Bu depo: ${basename(depo)}\n\n${depo} · ${o.dosyaSayisi} dosya\n\n${YONERGE}\n\n\`\`\`\n${o.metin}\n\`\`\``;
+  return `# This repo: ${basename(depo)}\n\n${depo} · ${cogul(o.dosyaSayisi, 'file')}\n\n${YONERGE}\n\n\`\`\`\n${o.metin}\n\`\`\``;
 }

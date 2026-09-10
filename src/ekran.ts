@@ -27,7 +27,7 @@ export function tik(): string { return `${YESIL}✔${R}`; }
 export function ok(): string { return `${CAM}▸${R}`; }
 export function uyari(s: string): string { return `${SARI}${s}${R}`; }
 export function sure(ms: number): string {
-  return `${SOLUK}${GRI}${ms < 1000 ? `${ms} ms` : `${(ms / 1000).toFixed(1)} sn`}${R}`;
+  return `${SOLUK}${GRI}${ms < 1000 ? `${ms} ms` : `${(ms / 1000).toFixed(1)} s`}${R}`;
 }
 
 /** Büyük banner, satır satır açılarak canlandırılır.
@@ -35,7 +35,7 @@ export function sure(ms: number): string {
  *  sayısı ile ekrana düşen satır sayısı tutmayınca banner alt alta tekrarlıyordu.
  *  Satır satır açılış imleç matematiği gerektirmez, bozulamaz. */
 export async function banner(): Promise<void> {
-  if (!TTY) { process.stderr.write('dxc — dogu x claude · depo haritası\n'); return; }
+  if (!TTY) { process.stderr.write('dxc — dogu x claude · repo map\n'); return; }
 
   const cizim = cfonts.render('dxc', { font: 'block', align: 'left', space: false, colors: ['white'] });
   const ham: string[] = cizim === false ? [] : cizim.array;
@@ -52,7 +52,7 @@ export async function banner(): Promise<void> {
     }
     process.stderr.write('\x1b[?25h');
   }
-  process.stderr.write(`   ${gecis('dogu x claude')}  ${SOLUK}${GRI}· depo haritası · Dogu X Vibes${R}\n\n`);
+  process.stderr.write(`   ${gecis('dogu x claude')}  ${SOLUK}${GRI}· repo map · Dogu X Vibes${R}\n\n`);
 }
 
 /** Tek satırlık başlık: değişiklik yokken kullanılır. */
@@ -83,7 +83,7 @@ export function son(metin: string): void {
 
 export function bekle(metin: string): void {
   satir(`${uyari('⏳')} ${metin}`);
-  satir(`   ${SOLUK}${GRI}bu sırada yazma — tuşlar oturuma gider${R}`);
+  satir(`   ${SOLUK}${GRI}don't type now — keystrokes go to the session${R}`);
 }
 
 /** Dönen gösterge + dolan çubuk. Dönen fonksiyon işi bitirir. */
@@ -99,7 +99,7 @@ export function calisiyor(metin: string, tahminSn = 10): (sonMetin?: string) => 
     const oran = Math.min(0.97, gecen / tahminSn);
     const dolu = Math.round(oran * 16);
     const cubuk = gecis('▰'.repeat(dolu)) + `${SOLUK}${GRI}${'▱'.repeat(16 - dolu)}${R}`;
-    donen.text = `${cubuk}  ${metin} ${SOLUK}${GRI}${gecen.toFixed(0)} sn${R}`;
+    donen.text = `${cubuk}  ${metin} ${SOLUK}${GRI}${gecen.toFixed(0)} s${R}`;
   }, 90);
   return (sonMetin) => {
     clearInterval(z);

@@ -72,10 +72,6 @@ dxc
   <b>Zero model calls on every launch.</b> If the map is current, the scan takes 250 ms and the session opens.
 </p>
 
-<p align="center">
-  <sub>Terminal output above is shown in English for readability; the CLI's messages are currently in Turkish.</sub>
-</p>
-
 ---
 
 ## It does three things
@@ -247,11 +243,10 @@ were used. Tokens are total processed tokens including input and cache, taken fr
 
 ```
 dxc            start
-dxc sifirla    rebuild the map from scratch
+dxc reset      rebuild the map from scratch
 ```
 
 That is all. Nothing is written to your `~/.claude/settings.json`.
-(`sifirla` is Turkish for "reset".)
 
 Rules and measurements: [`NE-YAPIYOR.md`](NE-YAPIYOR.md) (Turkish) · Design: [`TASLAK.md`](TASLAK.md) (Turkish)
 

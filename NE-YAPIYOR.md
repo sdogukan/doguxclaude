@@ -21,7 +21,7 @@ ve oturum açılır.
 Makinendeki bütün git depolarının tek satırlık listesi. Her deponun yanında ne
 iş yaptığını anlatan bir cümle, dosya sayısı ve son değişiklik tarihi vardır.
 
-`index.md` iki bölümlüdür: üstte bu harita, altta `## Hafıza` başlığıyla son otuz
+`index.md` iki bölümlüdür: üstte bu harita, altta `## Memory` başlığıyla son otuz
 oturum. İkisi de aynı dosyada olduğu için tek seferde yükleniyor.
 
 Her oturumun başında sisteme yüklenir. Böylece model, sen yolunu söylemeden
@@ -108,7 +108,7 @@ Bu yönerge ölçümle eklendi: aynı soruda ajanın araç çağrısı 6'dan 1'e
 
 ### Nedir
 
-Son otuz oturum, her biri tek cümle. Haritayla aynı dosyada, `## Hafıza`
+Son otuz oturum, her biri tek cümle. Haritayla aynı dosyada, `## Memory`
 başlığının altında durur, o yüzden ayrıca yüklenmesi gerekmez.
 
 ### Nasıl yazılır
@@ -138,7 +138,7 @@ oturuma cümle yazılmaz.
 | Yazıcı | Ne zaman | Hangi bölüm |
 |---|---|---|
 | harita tazeleyici | her `dxc` çağrısında | üst bölüm |
-| çıkış yazıcısı | oturum kapanınca | `## Hafıza` altı |
+| çıkış yazıcısı | oturum kapanınca | `## Memory` altı |
 
 Harita tazeleyici dosyayı yeniden üretirken hafıza bölümünü önce okur ve olduğu
 gibi geri koyar. Çıkış yazıcısı da yalnız hafıza bölümüne satır ekler. Üzerine

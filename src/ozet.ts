@@ -64,9 +64,9 @@ export function depoOzeti(depo: string, secenek: OzetSecenek = {}): Ozet {
       const toplam = kucuk.reduce((t, c) => t + agirlik.get(c)!, 0);
       const adlar = kucuk.map(ad).join(', ');
       const kirpik = adlar.length > s.adSatirTavani
-        ? adlar.slice(0, s.adSatirTavani) + `… (+${kucuk.length - adlar.slice(0, s.adSatirTavani).split(', ').length} tane)`
+        ? adlar.slice(0, s.adSatirTavani) + `… (+${kucuk.length - adlar.slice(0, s.adSatirTavani).split(', ').length} more)`
         : adlar;
-      satirlar.push(`${ic}… ${kucuk.length} klasör (${toplam} dosya): ${kirpik}`);
+      satirlar.push(`${ic}… ${kucuk.length} folders (${toplam} files): ${kirpik}`);
     } else {
       for (const c of kucuk) satirlar.push(`${ic}${ad(c)}/  (${agirlik.get(c)})`);
     }

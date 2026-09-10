@@ -13,18 +13,18 @@ import { depoOzeti } from './ozet.js';
 import { Depo, depoBilgisi, depolariBul } from './tarama.js';
 import { durumOku, durumYaz, sekilIzi } from './durum.js';
 import { birlestir, mevcutHafiza } from './hafiza.js';
-import { bugun, HARITA_YOLU, oku, yaz } from './util.js';
+import { bugun, cogul, HARITA_YOLU, oku, yaz } from './util.js';
 
 export interface HaritaSatiri { goreli: string; aciklama: string; dosya: number; sonDegisiklik: string }
 
-const ISTEM = `Aşağıda bir makinedeki git depolarının klasör yapısı var. Yapı koddan çıkarıldı: her klasörün yanındaki sayı o klasörün altındaki dosya sayısıdır, küçük klasörler tek satıra toplanmıştır.
+const ISTEM = `Below is the folder structure of the git repos on a machine. The structure was extracted by code: the number next to each folder is the count of files under it, and small folders are collapsed into one line.
 
-Her depo için TEK satır yaz: bu depo ne işi yapıyor. Sadece klasör ve dosya adlarından çıkarabildiğin kadarını yaz. Emin olmadığın yeri "belirsiz" de, UYDURMA.
+For each repo write ONE line: what this repo does. Write only what you can infer from folder and file names. Where you are not sure, say "unclear"; do NOT make things up. Write in English.
 
-Biçim, tam olarak:
-- <depo yolu> — <tek cümle>
+Format, exactly:
+- <repo path> — <one sentence>
 
-Başka hiçbir şey yazma: giriş cümlesi yok, başlık yok, sonuç yok.`;
+Write nothing else: no introduction, no heading, no conclusion.`;
 
 /** Modeli bir kez çağırır. Başarısızsa null; harita yine yazılır, açıklama boş kalır. */
 function aciklamalariUret(girdi: string, zamanAsimiMs = 300_000): Map<string, string> | null {
@@ -47,7 +47,8 @@ export function mevcutAciklamalar(): Map<string, string> {
   if (!icerik) return harita;
   for (const s of icerik.split('\n')) {
     const m = /^-\s+\*\*(.+?)\*\*\s+—\s+(.+?)\s*$/.exec(s);
-    if (m && m[2] !== '(açıklama yok)') harita.set(m[1]!, m[2]!);
+    // '(açıklama yok)': 0.2 ve öncesinin yazdığı boş açıklama; okunur, yazılmaz.
+    if (m && m[2] !== '(no description)' && m[2] !== '(açıklama yok)') harita.set(m[1]!, m[2]!);
   }
   return harita;
 }
@@ -95,17 +96,17 @@ export async function haritaTazele(
   // dönen gösterge banner'dan önce ekrana düşüyor.
   if (!secenek.sessiz && isVar) await banner();
   if (!secenek.sessiz) {
-    satir(`${ok()} ${vurgu(String(depolar.length))} depo tarandı ${sure(kodMs)}`);
-    for (const d of dusen) satir(`${uyari('−')} ${d} artık yok, haritadan düştü`);
-    for (const d of sekliDegisen) satir(`${uyari('~')} ${vurgu(d)} yapısı değişti`);
-    for (const d of yeniDepo) satir(`${uyari('+')} ${vurgu(d)} yeni depo`);
+    satir(`${ok()} ${vurgu(String(depolar.length))} ${depolar.length === 1 ? 'repo' : 'repos'} scanned in ${sure(kodMs)}`);
+    for (const d of dusen) satir(`${uyari('−')} ${d} is gone, dropped from the map`);
+    for (const d of sekliDegisen) satir(`${uyari('~')} ${vurgu(d)} structure changed`);
+    for (const d of yeniDepo) satir(`${uyari('+')} ${vurgu(d)} new repo`);
   }
 
   // Kutu, model çağrısından ÖNCE basılır: kullanıcı beklerken ne olduğunu görsün.
   // Bekleme uyarısı da kutuya girmeli, yoksa hiç görünmüyor.
   const modelCalisacak = yeni.length > 0 && !secenek.modelsiz;
   if (!secenek.sessiz) {
-    if (modelCalisacak) bekle(`${yeni.length} açıklama yazılacak, ${yeni.length * 8} sn sürebilir`);
+    if (modelCalisacak) bekle(`${cogul(yeni.length, 'description')} to write, may take ${yeni.length * 8} s`);
     if (secenek.ekSatir) satir(secenek.ekSatir);
     kutuBas();
   }
@@ -115,14 +116,14 @@ export async function haritaTazele(
   if (yeni.length && !secenek.modelsiz) {
     const girdi = depolar.filter((d) => yeni.includes(d.goreli)).map((d) => {
       const o = ozetler.get(d.goreli)!;
-      return `## ${d.goreli}\n${o.dosyaSayisi} dosya · son değişiklik ${d.sonDegisiklik}\n\`\`\`\n${o.metin}\n\`\`\``;
+      return `## ${d.goreli}\n${cogul(o.dosyaSayisi, 'file')} · last change ${d.sonDegisiklik}\n\`\`\`\n${o.metin}\n\`\`\``;
     }).join('\n\n');
     const bitir = secenek.sessiz ? () => {}
-      : calisiyor(`${yeni.length} açıklama yazılıyor`, yeni.length * 8);
+      : calisiyor(`writing ${cogul(yeni.length, 'description')}`, yeni.length * 8);
     const t1 = Date.now();
     uretilen = aciklamalariUret(girdi);
     modelMs = Date.now() - t1;
-    bitir(uretilen ? `${tik()} ${yeni.length} açıklama yazıldı ${sure(modelMs)}` : `${uyari('✗')} açıklama üretilemedi ${sure(modelMs)}`);
+    bitir(uretilen ? `${tik()} ${cogul(yeni.length, 'description')} written ${sure(modelMs)}` : `${uyari('✗')} could not generate descriptions ${sure(modelMs)}`);
   }
 
   if (degisti) {
@@ -142,10 +143,10 @@ export async function haritaTazele(
 }
 
 function haritaMetni(satirlar: HaritaSatiri[]): string {
-  const bas = ['# Harita', '', `${satirlar.length} depo · ${bugun()} · yapı koddan, açıklamalar modelden`,
-    '', 'Klasör yapısı burada tutulmaz; klasöre girilince o an üretilir.', ''];
+  const bas = ['# Map', '', `${cogul(satirlar.length, 'repo')} · ${bugun()} · structure from code, descriptions from the model`,
+    '', 'Folder structure is not kept here; it is generated when you enter a folder.', ''];
   const govde = satirlar.map((s) =>
-    `- **${s.goreli}** — ${s.aciklama || '(açıklama yok)'}\n  <sub>${s.dosya} dosya · ${s.sonDegisiklik || 'tarih yok'}</sub>`);
+    `- **${s.goreli}** — ${s.aciklama || '(no description)'}\n  <sub>${cogul(s.dosya, 'file')} · ${s.sonDegisiklik || 'no date'}</sub>`);
   return [...bas, ...govde, ''].join('\n');
 }
 

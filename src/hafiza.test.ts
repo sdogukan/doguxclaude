@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { ayristir, birlestir, bolumler, ekle, HAFIZA_BASLIK, konusmaKuyrugu, TAVAN } from './hafiza.js';
+import { ayristir, birlestir, bolumler, ekle, ESKI_BASLIK, HAFIZA_BASLIK, konusmaKuyrugu, TAVAN } from './hafiza.js';
 
 const HARITA = `# Harita
 
@@ -27,6 +27,16 @@ test('hafıza satırları ayrıştırılır, harita bölümü bozulmaz', () => {
   assert.equal(harita, HARITA, 'harita bölümü aynen dönmeli');
   assert.equal(hafiza.length, 2);
   assert.ok(hafiza[0]!.includes('birinci'));
+});
+
+test('0.2 ile yazılmış Türkçe başlıklı dosya okunur, yeni başlıkla yazılır', () => {
+  const eski = `${HARITA}\n\n${ESKI_BASLIK}\n\nSon oturumlar, en yeni üstte.\n\n- 2026-09-06 · a · eski satır.\n`;
+  const { harita, hafiza } = bolumler(eski);
+  assert.equal(harita, HARITA, 'harita bölümü aynen dönmeli');
+  assert.deepEqual(hafiza, ['- 2026-09-06 · a · eski satır.'], 'eski hafıza kaybolmamalı');
+  const yeni = birlestir(harita, hafiza);
+  assert.ok(yeni.includes(HAFIZA_BASLIK), 'yeni başlıkla yazılmalı');
+  assert.ok(!yeni.includes(ESKI_BASLIK), 'eski başlık artık yazılmamalı');
 });
 
 test('yeni oturum en üste eklenir', () => {

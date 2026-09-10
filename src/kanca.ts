@@ -83,10 +83,10 @@ export function istemdekiDepolar(istem: string, depolar: string[]): string[] {
 }
 
 /** Hafıza satırında görünecek ad. Asla "bilinmeyen" dönmez: depoysa depo adı,
- *  değilse klasör adı, kökse "kök dizin", hiçbiri değilse yolun kendisi. */
+ *  değilse klasör adı, kökse "root", hiçbiri değilse yolun kendisi. */
 export function projeAdi(yol: string): string {
   const y = yol || process.cwd();
-  if (y === '/') return 'kök dizin';
+  if (y === '/') return 'root';
   return basename(y) || y;
 }
 

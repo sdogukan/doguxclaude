@@ -70,7 +70,7 @@ test('git deposu olmayan yerde ve ad geçmiyorsa hiçbir şey yazılmaz', () => 
 });
 
 test('proje adı asla "bilinmeyen" olmaz', () => {
-  assert.equal(projeAdi('/'), 'kök dizin');
+  assert.equal(projeAdi('/'), 'root');
   assert.equal(projeAdi('/Users/x/Projects/web-app'), 'web-app');
   assert.equal(projeAdi('/Users/x'), 'x');
   assert.notEqual(projeAdi(''), 'bilinmeyen');

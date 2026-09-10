@@ -31,7 +31,7 @@ export function durumYaz(d: Durum): void {
 export function sekilIzi(ozetMetni: string): string {
   const adlar = ozetMetni
     .replace(/\s*\(\d+\)/g, '')                       // klasör sayıları
-    .replace(/…\s*\d+ klasör \(\d+ dosya\):/g, '…:')  // toplama satırındaki sayılar
+    .replace(/…\s*\d+ folders \(\d+ files\):/g, '…:')  // toplama satırındaki sayılar
     .trim();
   return createHash('sha256').update(adlar, 'utf8').digest('hex').slice(0, 16);
 }

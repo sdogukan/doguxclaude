@@ -46,9 +46,9 @@ test('dörtten fazla küçük kardeş tek satıra toplanır', () => {
   const dosyalar = [...Array(60)].map((_, i) => `agir/f${i}.ts`);
   for (const ad of ['a', 'b', 'c', 'd', 'e', 'f']) dosyalar.push(`kucukler/${ad}/x.ts`);
   const o = depoOzeti(depoKur(dosyalar));
-  const toplama = o.satirlar.find((s) => s.includes('klasör ('));
+  const toplama = o.satirlar.find((s) => s.includes('folders ('));
   assert.ok(toplama, 'toplama satırı olmalı');
-  assert.ok(/… 6 klasör \(6 dosya\)/.test(toplama!), toplama);
+  assert.ok(/… 6 folders \(6 files\)/.test(toplama!), toplama);
   // Adların TAMAMI yazılmalı, örnek değil: altı klasörün altısı da satırda olmalı.
   for (const ad of ['a', 'b', 'c', 'd', 'e', 'f']) assert.ok(toplama!.includes(ad), `${ad} eksik: ${toplama}`);
 });
@@ -57,7 +57,7 @@ test('üç ya da daha az küçük kardeş tek tek yazılır', () => {
   const dosyalar = [...Array(60)].map((_, i) => `agir/f${i}.ts`);
   for (const ad of ['a', 'b']) dosyalar.push(`kucukler/${ad}/x.ts`);
   const o = depoOzeti(depoKur(dosyalar));
-  assert.ok(!o.metin.includes('klasör ('), 'toplama yapılmamalı');
+  assert.ok(!o.metin.includes('folders ('), 'toplama yapılmamalı');
 });
 
 test('çıktı dosya sayısıyla orantılı büyümez', () => {

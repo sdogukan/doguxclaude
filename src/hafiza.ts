@@ -10,31 +10,35 @@
 import { spawnSync } from 'node:child_process';
 import { bugun, HARITA_YOLU, oku, yaz } from './util.js';
 
-export const HAFIZA_BASLIK = '## Hafıza';
+export const HAFIZA_BASLIK = '## Memory';
+/** 0.2 ve öncesinin yazdığı başlık. Okunur ki eski hafıza kaybolmasın; yazılmaz,
+ *  dosya ilk yazımda yeni başlığa kendiliğinden geçer. */
+export const ESKI_BASLIK = '## Hafıza';
 export const TAVAN = 30;
 
-const ISTEM = `Aşağıda bir çalışma oturumunun konuşması var (araç çıktıları yok, yalnız insan ve model metni).
+const ISTEM = `Below is the conversation of a work session (no tool output, only human and model text).
 
-Tek satır yaz, tam olarak şu biçimde:
-<klasörler> | <tek cümle>
+Write one line, in exactly this format:
+<folders> | <one sentence>
 
-<klasörler>: ÜZERİNDE ÇALIŞILAN proje/depo KÖKLERİNİN adları. Oturumun açıldığı
-yer DEĞİL, işin geçtiği yer. BU ALAN ZORUNLUDUR, boş bırakma.
+<folders>: the names of the project/repo ROOTS that were WORKED ON. Not where the
+session was opened, but where the work happened. THIS FIELD IS REQUIRED, do not leave it empty.
 
-  - Yalnız KÖK adını yaz. Alt klasör yazma: "packages/api" değil, deponun adı.
-  - Tam yol yazma, sadece son parça.
-  - Birden çok proje varsa virgülle ayır, en çok çalışılan başta, en fazla üçü.
-  - Konuşmada dosya yolları, komutlar ve depo adları geçer; oradan çıkar.
-    Örneğin "~/Projects/web-app/README.md" geçiyorsa klasör "web-app"tir.
+  - Write only the ROOT name. No subfolders: not "packages/api", but the repo's name.
+  - No full paths, only the last segment.
+  - If there are several projects, separate them with commas, most worked-on first, at most three.
+  - File paths, commands and repo names appear in the conversation; take them from there.
+    For example, if "~/Projects/web-app/README.md" appears, the folder is "web-app".
 
-<tek cümle>: bu oturumda ne yapıldı ve nerede kalındı. En fazla 20 kelime.
-Somut ol: hangi karar, hangi iş, hangi açık nokta. Genel laf etme.
+<one sentence>: what was done in this session and where it was left off. At most 20 words.
+Be concrete: which decision, which task, which open point. No generalities. Write in English.
 
-Başka hiçbir şey yazma: giriş yok, tırnak yok, madde işareti yok.`;
+Write nothing else: no introduction, no quotes, no bullet.`;
 
 /** Dosyayı ikiye ayırır. Hafıza başlığı yoksa alt bölüm boştur. */
 export function bolumler(metin: string): { harita: string; hafiza: string[] } {
-  const i = metin.indexOf(`\n${HAFIZA_BASLIK}`);
+  let i = metin.indexOf(`\n${HAFIZA_BASLIK}`);
+  if (i < 0) i = metin.indexOf(`\n${ESKI_BASLIK}`);
   if (i < 0) return { harita: metin.trimEnd(), hafiza: [] };
   const alt = metin.slice(i + 1);
   const hafiza = alt.split('\n').filter((s) => s.startsWith('- '));
@@ -45,7 +49,7 @@ export function bolumler(metin: string): { harita: string; hafiza: string[] } {
 export function birlestir(harita: string, hafiza: string[]): string {
   const bas = harita.trimEnd();
   if (!hafiza.length) return `${bas}\n`;
-  return `${bas}\n\n${HAFIZA_BASLIK}\n\nSon oturumlar, en yeni üstte.\n\n${hafiza.join('\n')}\n`;
+  return `${bas}\n\n${HAFIZA_BASLIK}\n\nLast sessions, newest first.\n\n${hafiza.join('\n')}\n`;
 }
 
 /** Var olan haritadaki hafıza satırlarını okur; harita yeniden yazılırken korunur. */
@@ -72,7 +76,7 @@ export function konusmaKuyrugu(kayitYolu: string, tavanKarakter = 25_000): strin
     let k: { type?: string; message?: { content?: unknown } };
     try { k = JSON.parse(satir); } catch { continue; }
     if (k.type !== 'user' && k.type !== 'assistant') continue;
-    const kim = k.type === 'user' ? 'İNSAN' : 'MODEL';
+    const kim = k.type === 'user' ? 'HUMAN' : 'MODEL';
     const ic = k.message?.content;
     if (typeof ic === 'string') { if (ic.trim()) parcalar.push(`${kim}: ${ic.trim()}`); continue; }
     if (!Array.isArray(ic)) continue;

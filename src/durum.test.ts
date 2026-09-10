@@ -20,14 +20,14 @@ test('klasör adı değişince şekil değişir', () => {
 });
 
 test('toplama satırındaki sayılar da yok sayılır', () => {
-  const dun = '… 27 klasör (52 dosya): auth, billing, tasks';
-  const bugun = '… 27 klasör (61 dosya): auth, billing, tasks';
+  const dun = '… 27 folders (52 files): auth, billing, tasks';
+  const bugun = '… 27 folders (61 files): auth, billing, tasks';
   assert.equal(sekilIzi(dun), sekilIzi(bugun));
 });
 
 test('toplama satırındaki AD değişirse şekil değişir', () => {
-  const dun = '… 27 klasör (52 dosya): auth, billing, tasks';
-  const bugun = '… 28 klasör (54 dosya): auth, billing, tasks, mobil';
+  const dun = '… 27 folders (52 files): auth, billing, tasks';
+  const bugun = '… 28 folders (54 files): auth, billing, tasks, mobil';
   assert.notEqual(sekilIzi(dun), sekilIzi(bugun));
 });
 

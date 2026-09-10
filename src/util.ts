@@ -33,3 +33,8 @@ export function hata(mekanizma: string, neOldu: string, neYapilmali: string): st
 }
 
 export function bugun(): string { return new Date().toISOString().slice(0, 10); }
+
+/** İngilizce çoğul: 1 repo, 2 repos. Çıktı İngilizce; kod adları Türkçe kalır. */
+export function cogul(n: number, tekil: string, cogulu = `${tekil}s`): string {
+  return `${n} ${n === 1 ? tekil : cogulu}`;
+}
