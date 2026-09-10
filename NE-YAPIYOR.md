@@ -190,3 +190,37 @@ Kırk kat dosya, dört kat satır.
 | `~/.doguxclaude/index.md` | harita **ve** hafıza | evet |
 | `~/.doguxclaude/durum.json` | şekil parmak izleri | hayır |
 | `~/.doguxclaude/oturum/` | oturumda yazılmış depolar, oturum kayıt yolu | hayır |
+
+---
+
+## Yayın
+
+npm'e insan eli değmez: anahtar yok, tek kullanımlık şifre yok.
+
+`v*` etiketi itilince `.github/workflows/publish.yml` çalışır. GitHub Actions bu
+iş için kısa ömürlü bir OIDC kimliği üretir; npm bunu paket ayarlarındaki
+**Trusted Publisher** kaydıyla (sahip `sdogukan`, depo `doguxclaude`, workflow
+`publish.yml`) doğrular ve yayını kabul eder. Kaynak kanıtı (provenance) npm
+tarafından kendiliğinden eklenir: paket sayfasında hangi commit'ten, hangi
+iş akışıyla üretildiği görünür.
+
+İki güvence, yayın öncesi:
+
+| denetim | neden |
+|---|---|
+| package.json sürümü etiketle aynı olmalı | yanlış etiket yanlış sürümü yayınlamasın |
+| sürüm kayıt defterinde yoksa yayınlanır | npm'in anlaşılmaz 403'ü yerine açık mesaj |
+
+Derleme ve testler yayından önce koşar; biri düşerse yayın olmaz.
+
+Etiketi bu iş akışından **önce** itilmiş bir sürüm için elle tetikleme var
+(Actions → Publish → Run workflow). Aynı denetimler geçerli: sürümün etiketi
+çalışılan commit'i göstermeli.
+
+Sürüm çıkarma, üç komut:
+
+```
+npm version minor --no-git-tag-version   # package.json + lock
+git commit -am "Sürüm X.Y.Z" && git tag vX.Y.Z
+git push origin main --tags
+```

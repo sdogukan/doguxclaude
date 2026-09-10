@@ -1,0 +1,68 @@
+# npm yayını: anahtar yok, OTP yok.
+#
+# Yetki OIDC ile alınır: GitHub Actions bu iş için kısa ömürlü bir kimlik üretir,
+# npm bunu paket ayarlarındaki "Trusted Publisher" kaydıyla doğrular
+# (sahip: sdogukan, depo: doguxclaude, workflow: publish.yml). Kaynak kanıtı
+# (provenance) npm tarafından kendiliğinden eklenir; herkese açık depo ve paket
+# için ek bayrak gerekmez.
+#
+# İki tetikleyici:
+#   - `v*` etiketi itilince: olağan yol. Etiket ile package.json sürümü aynı olmalı.
+#   - Elle (workflow_dispatch): etiketi bu dosyadan ÖNCE itilmiş bir sürüm için.
+#     Sürümün etiketi çalışılan commit'i göstermeli; etiketsiz commit yayınlanmaz.
+#
+# Her iki yolda da kayıt defterinde zaten olan sürüm yeniden yayınlanmaz;
+# npm'in anlaşılmaz 403'ü yerine açık bir mesajla durulur.
+name: Publish
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  id-token: write   # OIDC kimliği için zorunlu
+  contents: read
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0   # etiketler de gelsin: sürüm-etiket denetimi için
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'   # npm 11.5.1+ gerekir; Node 24 bunu paketler
+          registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false
+
+      - name: Sürüm ile etiket aynı mı
+        run: |
+          set -eu
+          surum="v$(node -p "require('./package.json').version")"
+          if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            [ "$GITHUB_REF_NAME" = "$surum" ] \
+              || { echo "::error::etiket $GITHUB_REF_NAME, package.json $surum; ikisi aynı olmalı"; exit 1; }
+          else
+            git tag --points-at HEAD | grep -qx "$surum" \
+              || { echo "::error::$surum etiketi bu commit'i göstermiyor; önce etiketle"; exit 1; }
+          fi
+          echo "SURUM=${surum#v}" >> "$GITHUB_ENV"
+
+      - name: Sürüm kayıt defterinde zaten var mı
+        run: |
+          set -eu
+          if npm view "doguxclaude@$SURUM" version >/dev/null 2>&1; then
+            echo "::error::doguxclaude@$SURUM zaten yayında; sürümü yükselt"; exit 1
+          fi
+
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+      - run: npm publish
