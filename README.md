@@ -1,38 +1,46 @@
 <h1 align="center">doguxclaude</h1>
 
 <p align="center">
-  <b>Makineni zaten bilen Claude Code.</b><br>
-  <sub>Terminale <code>dxc</code> yaz. Gerisi kendiliğinden.</sub>
+  <b>Claude Code that already knows your machine.</b><br>
+  <sub>Type <code>dxc</code> in your terminal. The rest is automatic.</sub>
+</p>
+
+<p align="center">
+  <code>dxc</code> starts Claude Code with a map of every git repo on your machine, the file structure of the repo you are in, and a one-sentence summary of each of your last 30 sessions already in context, so the model starts working instead of searching.
 </p>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/doguxclaude"><img src="https://img.shields.io/npm/v/doguxclaude?color=a855f7&labelColor=1a1a2e&label=npm" alt="npm"></a>
-  <img src="https://img.shields.io/badge/kurulum-s%C4%B1f%C4%B1r%20ad%C4%B1m-a855f7?labelColor=1a1a2e" alt="sıfır kurulum">
-  <img src="https://img.shields.io/badge/token-%2562%20daha%20az-22d3ee?labelColor=1a1a2e" alt="%62 daha az token">
-  <img src="https://img.shields.io/badge/lisans-MIT-a855f7?labelColor=1a1a2e" alt="MIT">
+  <img src="https://img.shields.io/badge/setup-zero%20steps-a855f7?labelColor=1a1a2e" alt="zero setup">
+  <img src="https://img.shields.io/badge/tokens-62%25%20fewer-22d3ee?labelColor=1a1a2e" alt="62% fewer tokens">
+  <img src="https://img.shields.io/badge/license-MIT-a855f7?labelColor=1a1a2e" alt="MIT">
+</p>
+
+<p align="center">
+  <sub>English · <a href="https://github.com/sdogukan/doguxclaude/blob/main/README.tr.md">Türkçe</a></sub>
 </p>
 
 <h3 align="center">
-  Alandaki her şey kurulum istiyor.<br>Bu, tek komut.
+  Everything else in this space asks you to set something up.<br>This is one command.
 </h3>
 
 <p align="center">
-  <sub>Ötekiler Obsidian kurdurur, Docker ayağa kaldırtır, 39 yer tutucu doldurtur.<br>
-  Burada kurulacak bir şey yok. Ezberlenecek komut yok.</sub>
+  <sub>The others have you install Obsidian, bring up Docker, fill in 39 placeholders.<br>
+  Here there is nothing to install. No commands to memorize.</sub>
 </p>
 
 ```
 ╭──────────────────────┬──────────────────────┬──────────────────────╮
 │                      │                      │                      │
-│         %62          │         %49          │         %35          │
-│    DAHA AZ TOKEN     │      DAHA HIZLI      │    DAHA AZ TOKEN     │
+│         62%          │         49%          │         35%          │
+│     FEWER TOKENS     │        FASTER        │     FEWER TOKENS     │
 │                      │                      │                      │
-│   "nerede kaldım"    │   "nerede kaldım"    │   "bu depo nedir"    │
-│     357K → 136K      │    82 sn → 41 sn     │      107K → 70K      │
+│    "where was I"     │    "where was I"     │  "what's this repo"  │
+│     357K → 136K      │     82 s → 41 s      │      107K → 70K      │
 │                      │                      │                      │
-│        hafıza        │        hafıza        │    harita + yapı     │
+│        memory        │        memory        │   map + structure    │
 ╰──────────────────────┴──────────────────────┴──────────────────────╯
-           aynı sorular, dxc ile ve dxc olmadan · üçer koşu           
+        same questions, with and without dxc · three runs each        
 ```
 
 ```bash
@@ -51,222 +59,203 @@ dxc
 
    dogu x claude  ·  Dogu X Vibes
 
-╭──────────────────────────────────────╮
-│ ▸ 11 depo tarandı 220 ms             │
-│ + Projects/web-app yeni depo         │
-│ ~ Desktop/doguxclaude yapısı değişti │
-│ ▸ buradasın: api-platform            │
-╰──────────────────────────────────────╯
- ✔ claude başlatılıyor 187 ms
+╭─────────────────────────────────────────╮
+│ ▸ 11 repos scanned in 220 ms            │
+│ + Projects/web-app new repo             │
+│ ~ Desktop/doguxclaude structure changed │
+│ ▸ you are here: api-platform            │
+╰─────────────────────────────────────────╯
+ ✔ starting claude 187 ms
 ```
 
 <p align="center">
-  <b>Her açılışta sıfır model çağrısı.</b> Harita güncelse tarama 250 ms, oturum açılır.
+  <b>Zero model calls on every launch.</b> If the map is current, the scan takes 250 ms and the session opens.
+</p>
+
+<p align="center">
+  <sub>Terminal output above is shown in English for readability; the CLI's messages are currently in Turkish.</sub>
 </p>
 
 ---
 
-## Üç şey yapar
+## It does three things
 
 ```
 ╭───────────────╮   ╭───────────────╮   ╭───────────────╮
-│    HARİTA     │   │     YAPI      │   │    HAFIZA     │
+│      MAP      │   │   STRUCTURE   │   │    MEMORY     │
 │               │   │               │   │               │
-│  nerede ne    │   │  içinde ne    │   │  ne konuştuk  │
-│     var       │   │     var       │   │               │
+│  what is      │   │  what is      │   │  what we      │
+│  where        │   │  inside       │   │  talked about │
 │               │   │               │   │               │
-│  11 depo      │   │  10 ms        │   │  30 oturum    │
-│  tek satır    │   │  koddan       │   │  tek cümle    │
+│  11 repos     │   │  10 ms        │   │  30 sessions  │
+│  one line     │   │  from code    │   │  one sentence │
 ╰───────────────╯   ╰───────────────╯   ╰───────────────╯
-     her açılış        adını anınca         çıkarken
+  every launch      when you name it         on exit
 ```
 
 ---
 
-## Neden
+## Why
 
-Claude Code'a bir depoyu sorduğunda önce onu **aramaya** çıkar. Nerede olduğunu
-bilmez, içinde ne olduğunu bilmez, hangi dosyanın var olduğunu bilmez.
+Ask Claude Code about a repo and the first thing it does is **go looking** for it.
+It does not know where the repo is, what is in it, or which files exist.
 
 ```
-╭─ dxc olmadan ────────────────────────────────────╮
-│ › api-platform nedir, tek cümle                  │
+╭─ without dxc ────────────────────────────────────╮
+│ › what is api-platform, one sentence             │
 │                                                  │
-│   ⎿ ls -d ~/*api-platform*     depoyu arıyor     │
-│   ⎿ ls api-platform/           yapıyı arıyor     │
-│   ⎿ cat README.md              ✗ böyle dosya yok │
+│   ⎿ ls -d ~/*api-platform*     looking for repo  │
+│   ⎿ ls api-platform/           looking at layout │
+│   ⎿ cat README.md              ✗ no such file    │
 │                                                  │
-│   83.906 token · 15,8 sn                         │
+│   83,906 tokens · 15.8 s                         │
 ╰──────────────────────────────────────────────────╯
 ```
 
-Ajan, olmayan bir `README.md`'yi tahmin etti ve hata aldı. O depoda `CLAUDE.md`
-var. Bilmesinin bir yolu yoktu.
+The agent guessed at a `README.md` that does not exist and got an error. That
+repo has a `CLAUDE.md`. It had no way of knowing.
 
 ```
-╭─ dxc ile ───────────────────────────────────────────╮
-│ › api-platform nedir, tek cümle                     │
+╭─ with dxc ──────────────────────────────────────────╮
+│ › what is api-platform, one sentence                │
 │                                                     │
-│   harita ve yapı zaten elinde, arama yok            │
-│   ⎿ cat CLAUDE.md              doğrudan doğru dosya │
+│   map and structure already in hand, no searching   │
+│   ⎿ cat CLAUDE.md              straight to the file │
 │                                                     │
-│   48.915 token · 10,6 sn                            │
+│   48,915 tokens · 10.6 s                            │
 ╰─────────────────────────────────────────────────────╯
 ```
 
-Yapı bloğu kök dosyaları **ada ada** yazar. Artık tahmin etmiyor.
+The structure block lists root files **by name**. No more guessing.
 
 ---
 
-## Angarya koda, yargı modele
+## Grunt work in code, judgement in the model
 
-Bu alandaki araçların çoğu aynı refleksi paylaşıyor: **işi modele yaptır.**
-Vektör veritabanı kur, gömme üret, her düzenlemede bir alt ajan çalıştır.
+Most tools in this space share the same reflex: **make the model do it.**
+Set up a vector database, generate embeddings, run a sub-agent on every edit.
 
-Biz tersini yapıyoruz. **Bir deponun yapısını çıkarmak okuma işidir, yargı değil.**
-`git ls-files` bunu 10 ms'de yapar ve asla bayatlamaz. Modele yalnız gerçekten
-yargı gerektiren tek şeyi soruyoruz: bu depo ne iş yapıyor, tek cümle, bir kez.
+We do the opposite. **Extracting a repo's structure is reading, not judgement.**
+`git ls-files` does it in 10 ms and never goes stale. The model is asked only the
+one thing that truly needs judgement: what this repo does, one sentence, once.
 
-| Ne | Süre |
+| What | Time |
 |---|---|
-| 11 depoyu tara, haritayı tazele | **250 ms** |
-| 1.120 dosyalık deponun yapısını çıkar | **10 ms** |
-| Oturumu tek cümleye indir | **6 sn**, arka planda |
+| Scan 11 repos, refresh the map | **250 ms** |
+| Extract the structure of a 1,120-file repo | **10 ms** |
+| Reduce a session to one sentence | **6 s**, in the background |
 
-Çıktı kod tabanıyla büyümez:
+Output does not grow with the codebase:
 
 ```
-    28 dosya  ▏████                      14 satır
-   246 dosya  ▏███████████               41 satır
- 1.120 dosya  ▏████████████████████      72 satır
+    28 files  ▏████                      14 lines
+   246 files  ▏███████████               41 lines
+ 1,120 files  ▏████████████████████      72 lines
 ```
 
-Bir klasör, dosyaların en az **yüzde ikisini** tutuyorsa açılır. Küçük kardeşler
-tek satıra toplanır ama **adların tamamı yazılır**. Ölçüldü: üç örnek verilince
-ajan kalanları öğrenmek için `ls` çalıştırıyordu.
+A folder is expanded if it holds at least **two percent** of the files. Smaller
+siblings are collapsed into one line, but **every name is written out**. Measured:
+given three examples, the agent ran `ls` to learn the rest.
 
 ---
 
-## Alanda ne var
+## What else is out there
 
-| | Kurulum | Hafıza nasıl yazılır | Model maliyeti |
+| | Setup | How memory gets written | Model cost |
 |---|---|---|---|
-| [claude-code-memory-setup](https://github.com/lucasrosati/claude-code-memory-setup) <sub>966★</sub> | Obsidian + 3 eklenti, Graphify, Python paketi, cron | `/save` yazmayı hatırlarsan | — |
-| [claudecode-harness](https://github.com/anothervibecoder-s/claudecode-harness) <sub>222★</sub> | Şablonu kopyala, **39 yer tutucu** doldur, kancayı kendin yaz | Model talimatı unutmazsa | — |
-| [Claude-code-memory](https://github.com/Durafen/Claude-code-memory) <sub>74★</sub> | İki depo, **Docker, Qdrant**, gömme API anahtarı | İndeksleyiciyi çalıştırınca | Her düzenlemede 60 sn'ye kadar Sonnet |
-| [clauth Hive Mind](https://github.com/umuplus/clauth) <sub>6★</sub> | Profil başına aç, **her oturum Y/n** onayla | Onaylarsan | Oturum başına tam ajan koşusu |
-| **doguxclaude** | **Yok** | **Kendiliğinden** | **Oturum başına tek cümle** |
+| [claude-code-memory-setup](https://github.com/lucasrosati/claude-code-memory-setup) <sub>966★</sub> | Obsidian + 3 plugins, Graphify, a Python package, cron | If you remember to type `/save` | — |
+| [claudecode-harness](https://github.com/anothervibecoder-s/claudecode-harness) <sub>222★</sub> | Copy the template, fill in **39 placeholders**, write the hook yourself | If the model does not forget the instruction | — |
+| [Claude-code-memory](https://github.com/Durafen/Claude-code-memory) <sub>74★</sub> | Two repos, **Docker, Qdrant**, an embeddings API key | When you run the indexer | Up to 60 s of Sonnet on every edit |
+| [clauth Hive Mind](https://github.com/umuplus/clauth) <sub>6★</sub> | Enable per profile, confirm **Y/n every session** | If you confirm | A full agent run per session |
+| **doguxclaude** | **None** | **Automatically** | **One sentence per session** |
 
-**İkisi araç bile değil.** 966 yıldızlı olanda 433 satır çalıştırılabilir kod ve
-1.276 satır README var; `/save` ile `/resume` gerçek komut değil, CLAUDE.md içine
-düzyazı yazılmış talimatlar. 222 yıldızlı olanda iki markdown dosyası var, tek bir
-kod bloğu yok, bahsettiği kanca depoda mevcut değil.
+**Two of them are not even tools.** The 966-star one has 433 lines of executable
+code and 1,276 lines of README; `/save` and `/resume` are not real commands, they
+are prose instructions written into CLAUDE.md. The 222-star one is two markdown
+files without a single code block, and the hook it mentions does not exist in the
+repo.
 
-**Rakamları da tutmuyor.** Biri "71,5 kat az token" diyor; kaynağı iki tahminin
-bölümü ve aynı sayfa başka yerde "499 kat" yazıyor. Bir diğerinin README'sindeki
-sayıların depoda tek bir benchmark karşılığı yok.
+**The numbers do not hold up either.** One claims "71.5× fewer tokens"; the source
+is one estimate divided by another, and the same page says "499×" elsewhere. The
+numbers in another one's README have no benchmark counterpart anywhere in its repo.
 
-Bizim rakamlarımızın yöntemi aşağıda yazılı, kaybettiğimiz senaryo dahil.
+The method behind our numbers is written below, including the scenario we lose.
 
-### Nerede geridiyiz
+### Where we are behind
 
-**Derinlik.** Onlar tree-sitter ile fonksiyon ve sınıf düzeyine iniyor. Bizim
-haritamız klasör ve dosya adında kalıyor.
+**Depth.** They go down to function and class level with tree-sitter. Our map
+stops at folder and file names.
 
-**Kalıcılık.** Hafızamız 30 satır; otuz birinci gelince en eski kalıcı olarak
-siliniyor. clauth'un wiki'si birikiyor ve aranabiliyor.
+**Persistence.** Our memory is 30 lines; when the thirty-first arrives, the oldest
+is dropped for good. clauth's wiki accumulates and is searchable.
 
-**Olgunluk.** Sıfır kullanıcı, şimdilik yalnız macOS'ta denendi.
+**Maturity.** Zero users, tested only on macOS so far.
 
-Bunlar tercih. Arama ve grafik eklemek altyapı ister; altyapı da kurulum demek.
-Biz sıfır kurulumu koruyoruz.
-
----
-
-## Hafıza
-
-Sen çıkarken o oturum tek cümleye iner ve haritanın altına yazılır. Ertesi gün
-`dxc` yazdığında nerede kaldığın zaten orada.
-
-```
-## Hafıza
-
-- 2026-09-06 · doguxclaude · Kanca sorulan deponun yapısını verecek şekilde
-  değişti; npm yayını erişim anahtarına takıldı.
-- 2026-09-05 · api-platform · Fargate akışı planlandı, CDK stack açık kaldı.
-```
-
-Otuz satır tavanı var, dosya şişmez. Arka planda koşar, terminal anında geri gelir.
-Pencereyi kapatsan bile yazılır.
+These are choices. Adding search and a graph takes infrastructure, and
+infrastructure means setup. We keep setup at zero.
 
 ---
 
-## Ölçüm
+## Memory
 
-Aynı sorular, `dxc` ile ve `dxc` olmadan.
+When you exit, that session is reduced to one sentence and written under the map.
+The next day you type `dxc`, and where you left off is already there.
 
-| Soru | Token | Süre | Tur |
+```
+## Memory
+
+- 2026-09-06 · doguxclaude · Hook changed to inject the structure of the repo
+  being asked about; npm publish blocked on an access token.
+- 2026-09-05 · api-platform · Fargate flow planned, CDK stack left open.
+```
+
+Capped at thirty lines, so the file never bloats. Runs in the background; the
+terminal comes back instantly. It is written even if you close the window.
+
+---
+
+## Measurements
+
+Same questions, with and without `dxc`.
+
+| Question | Tokens | Time | Turns |
 |---|---|---|---|
-| "Nerede kalmıştım" <br><sub>hafıza sayesinde</sub> | 357K → **136K** · %62 az | 81,5 → **41,3 sn** · %49 hızlı | 19,7 → 12,0 |
-| "Bu depo nedir, nerede" <br><sub>harita + yapı sayesinde</sub> | 107K → **70K** · %35 az | 22,0 → **14,3 sn** · %35 hızlı | 5,8 → 4,5 |
+| "Where did I leave off" <br><sub>thanks to memory</sub> | 357K → **136K** · 62% fewer | 81.5 → **41.3 s** · 49% faster | 19.7 → 12.0 |
+| "What is this repo, where is it" <br><sub>thanks to map + structure</sub> | 107K → **70K** · 35% fewer | 22.0 → **14.3 s** · 35% faster | 5.8 → 4.5 |
 
-Hafızasız oturumda model ne yaptığını **dosyalardan kazıyor**: git kayıtlarına
-bakıyor, dosya saatlerine bakıyor, README'yi ve kaynak dosyaları açıyor. Yaklaşık
-yirmi tur, seksen saniye.
+Without memory, the model **digs through files** to find out what it did: it reads
+git history, checks file timestamps, opens the README and source files. About
+twenty turns, eighty seconds.
 
-Maliyet de **öngörülebilir** hale geliyor. Hafızasız üç koşu 196K, 412K ve 463K
-token harcadı; arada iki buçuk kat fark var. Hafızalı koşular 99K, 147K, 163K.
+Cost also becomes **predictable**. Three runs without memory spent 196K, 412K and
+463K tokens, a two-and-a-half-fold spread. With memory: 99K, 147K, 163K.
 
-**Her zaman kazanmaz.** Küçük bir depoda zaten derine inen bir soruda yapıyı
-önceden vermek ajanı daha çok gezdirdi: %5 fazla token, %21 daha yavaş. dxc
-"bu nedir, nerede, hangi dosya var" sorularında kazandırır.
+**It does not always win.** On a small repo, on a question that already goes deep,
+handing over the structure up front sent the agent on a longer tour: 5% more
+tokens, 21% slower. dxc pays off on "what is this, where is it, which files exist"
+questions.
 
-<sub>İki depo (28 ve 1.120 dosya), iki soru tipi, hafıza için ayrı senaryo.
-Harita ve yapıda ikişer, hafızada üçer koşu. Hafıza satırları elle yazılmadı,
-sistemin gerçek oturum kayıtlarından ürettiği satırlar kullanıldı. Token, girdi
-ve önbellek dahil toplam işlenen jetondur; `claude -p --output-format json`
-çıktısından.</sub>
-
----
-
-## Komutlar
-
-```
-dxc            başlat
-dxc sifirla    haritayı sıfırdan üret
-```
-
-Hepsi bu. `~/.claude/settings.json` dosyana hiçbir şey yazılmaz.
-
-Kurallar ve ölçümler: [`NE-YAPIYOR.md`](NE-YAPIYOR.md) · Tasarım: [`TASLAK.md`](TASLAK.md)
+<sub>Two repos (28 and 1,120 files), two question types, a separate scenario for
+memory. Two runs each for map and structure, three each for memory. Memory lines
+were not hand-written; the lines the system produced from real session transcripts
+were used. Tokens are total processed tokens including input and cache, taken from
+`claude -p --output-format json` output.</sub>
 
 ---
 
-## English
+## Commands
 
-`dxc` starts Claude Code with your machine already in context: a **map** of every
-git repo, the **structure** of the repo you ask about (from `git ls-files`, 10 ms),
-and a **memory** of your last 30 sessions (one sentence each, written on exit).
-
-**Grunt work in code, judgement in the model.** Extracting a repo's structure is a
-reading, not a judgement, so code does it and it never goes stale. The model is
-asked only what this repo is for, one sentence, once per repo.
-
-Measured, same questions with and without dxc. On "where did I leave off", memory
-cuts **62% of tokens** and **49% of time**. On "what is this repo", the map and
-structure cut **35%** of both. Cost also becomes predictable: without memory three
-runs spent 196K, 412K and 463K tokens; with memory, 99K, 147K, 163K.
-
-Setup for the alternatives ranges from six tools and a cron job, to Docker plus
-Qdrant plus an embeddings API key, to filling in 39 placeholders. Setup here:
-
-```bash
-npm install -g doguxclaude && dxc
+```
+dxc            start
+dxc sifirla    rebuild the map from scratch
 ```
 
-Where we are behind: no AST, no semantic search, and memory is capped at 30 lines
-before the oldest is dropped for good. Trade-offs for zero setup, listed above
-rather than hidden.
+That is all. Nothing is written to your `~/.claude/settings.json`.
+(`sifirla` is Turkish for "reset".)
+
+Rules and measurements: [`NE-YAPIYOR.md`](NE-YAPIYOR.md) (Turkish) · Design: [`TASLAK.md`](TASLAK.md) (Turkish)
+
+---
 
 <p align="center">
   <sub>MIT · Doğukan Şahin · <a href="https://github.com/sdogukan">Dogu X Vibes</a></sub>
